@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -872,9 +871,24 @@
   .hist-move .act.blank { color: #666; }
   .hist-move .act.item  { color: var(--green); }
   .hist-empty { font-size: 12px; letter-spacing: 2px; color: var(--dimmer); text-align: center; padding: 30px; }
+
+  /* ── Particles ── */
+  #particle-canvas {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 9998;
+  }
+  .btn-flash {
+    animation: btnFlash 0.18s ease-out;
+  }
+  @keyframes btnFlash {
+    0%   { filter: brightness(2.5); transform: scale(0.95); }
+    100% { filter: brightness(1);   transform: scale(1); }
+  }
 </style>
 </head>
 <body>
+<canvas id="particle-canvas"></canvas>
 <div id="wrap">
 
   <div class="hdr">
@@ -1680,7 +1694,7 @@ function stealItem(key) {
 
 // ── Use item (player) ──────────────────────────────────────────────────────
 function useItem(key) {
-  if (!gm || !gm.isPlayerTurn || gm.gameOver) return;
+  if (!gm || !gm.isPlayerTurn || gm.gameOver || gm.roundOver) return;
   if ((gm.playerItems[key] || 0) < 1) return;
 
   gm.playerItems[key]--;
@@ -1735,7 +1749,7 @@ function useItem(key) {
 
 // ── Player shoots ──────────────────────────────────────────────────────────
 function playerShoot(target) {
-  if (!gm || !gm.isPlayerTurn || gm.gameOver) return;
+  if (!gm || !gm.isPlayerTurn || gm.gameOver || gm.roundOver) return;
 
   let shellType = gm.shells[gm.shellIdx];
   if (gm.playerFx.inverter) { shellType = shellType === 'live' ? 'blank' : 'live'; gm.playerFx.inverter = false; }
@@ -1756,24 +1770,33 @@ function playerShoot(target) {
       if (jammered) { keepTurn = true; gm.playerFx.jammer = false; }
       playLog(`You shot dealer — LIVE (${actualDmg} dmg)${jammered ? ' [Jammer: kept turn]' : ''}`, 'good');
       recordMove('player', `🔫 Shoot Dealer — LIVE (${actualDmg} dmg)${jammered ? ' + Jammer' : ''}`);
-      resultHtml = `<div class="shot-result hit">🔫 HIT — Dealer takes ${actualDmg} damage</div>`;
+      resultHtml = `<div class="shot-result hit">🔫 HIT — Dealer takes ${actualDmg} damage${jammered?' · Jammer: your turn again!':''}</div>`;
     } else {
-      playLog('You shot dealer — BLANK (no damage, turn ends)', 'neutral');
-      recordMove('player', '🔫 Shoot Dealer — BLANK');
-      resultHtml = `<div class="shot-result blank">○ Blank — turn passes to dealer</div>`;
+      // Shot dealer with blank — jammer still gives extra turn
+      const jammered = gm.playerFx.jammer;
+      if (jammered) { keepTurn = true; gm.playerFx.jammer = false; }
+      playLog(`You shot dealer — BLANK${jammered?' [Jammer: kept turn]':'(no damage, turn ends)'}`, jammered?'good':'neutral');
+      recordMove('player', `🔫 Shoot Dealer — BLANK${jammered?' + Jammer':''}`);
+      resultHtml = jammered
+        ? `<div class="shot-result info">○ Blank — but Jammer keeps your turn!</div>`
+        : `<div class="shot-result blank">○ Blank — turn passes to dealer</div>`;
     }
   } else {
     if (shellType === 'blank') {
       keepTurn = true;
+      // Blank self does NOT consume jammer
       playLog('You shot yourself — BLANK (keep turn!)', 'good');
       recordMove('player', '🔫 Shoot Self — BLANK (kept turn)');
       resultHtml = `<div class="shot-result good">○ Blank — you keep your turn!</div>`;
     } else {
       const actualDmg = Math.min(dmg, gm.playerLives);
       gm.playerLives -= actualDmg;
-      playLog(`You shot yourself — LIVE (${actualDmg} dmg taken)`, 'bad');
-      recordMove('player', `🔫 Shoot Self — LIVE (${actualDmg} dmg)`);
-      resultHtml = `<div class="shot-result hit">💀 LIVE — you take ${actualDmg} damage</div>`;
+      // Live self-shot: jammer still gives turn back (consumed)
+      const jammered = gm.playerFx.jammer;
+      if (jammered) { keepTurn = true; gm.playerFx.jammer = false; }
+      playLog(`You shot yourself — LIVE (${actualDmg} dmg)${jammered?' [Jammer: kept turn]':''}`, 'bad');
+      recordMove('player', `🔫 Shoot Self — LIVE (${actualDmg} dmg)${jammered?' + Jammer':''}`);
+      resultHtml = `<div class="shot-result hit">💀 LIVE — you take ${actualDmg} damage${jammered?' · Jammer saves your turn!':''}</div>`;
     }
   }
 
@@ -1812,10 +1835,16 @@ function reloadChamber() {
 function checkDeath() {
   if (!gm) return false;
   if (gm.dealerLives <= 0) {
+    gm.dealerLives = 0; // ensure hearts fully drained
+    gm.gameOver = true;
+    renderPlay(); // update hearts before showing overlay
     endRound('player');
     return true;
   }
   if (gm.playerLives <= 0) {
+    gm.playerLives = 0; // ensure hearts fully drained
+    gm.gameOver = true;
+    renderPlay(); // update hearts before showing overlay
     endRound('dealer');
     return true;
   }
@@ -1826,6 +1855,9 @@ function checkDeath() {
 let roundWins = { player: 0, dealer: 0 };
 
 function endRound(winner) {
+  if (!gm) return;
+  gm.gameOver = true;  // prevent any further input
+  gm.roundOver = true;
   const cur = currentHistGame();
   const roundIdx = gm.round - 1;
   if (cur && cur.rounds[roundIdx]) cur.rounds[roundIdx].winner = winner;
@@ -1837,8 +1869,6 @@ function endRound(winner) {
     roundWins.dealer++;
     playLog(`━━ ROUND ${gm.round} OVER — DEALER WINS the round ━━`, 'bad');
   }
-
-  gm.roundOver = true;
 
   const isLastRound = gm.round >= gm.maxRounds;
 
@@ -1869,6 +1899,7 @@ function nextRound() {
   gm.dealerItems  = newItems(4);
   gm.isPlayerTurn = true;
   gm.roundOver = false;
+  gm.gameOver = false;  // allow actions again
   playLogEntries = [];
   const cur = currentHistGame();
   if (cur) cur.rounds.push({ round: gm.round, loads: [], winner: null });
@@ -2126,12 +2157,17 @@ function executeDealerMove(move) {
       recordMove('dealer', `🔫 Shoot Player — LIVE (${actualDmg} dmg)${jammered?' + Jammer':''}`);
       resultHtml = `<div class="shot-result hit">💀 Dealer hits you — ${actualDmg} damage!</div>`;
     } else {
-      playLog('Dealer shot you — BLANK (turn passes to you)', 'good');
-      recordMove('dealer', '🔫 Shoot Player — BLANK');
-      resultHtml = `<div class="shot-result blank">○ Dealer fired blank — your turn!</div>`;
+      // Blank at player — jammer still keeps turn
+      const jammered = gm.dealerFx.jammer;
+      if (jammered) { keepTurn = true; gm.dealerFx.jammer = false; }
+      playLog(`Dealer shot you — BLANK${jammered?' [Jammer: dealer keeps turn]':'(turn passes to you)'}`, jammered?'neutral':'good');
+      recordMove('dealer', `🔫 Shoot Player — BLANK${jammered?' + Jammer':''}`);
+      resultHtml = jammered
+        ? `<div class="shot-result info">○ Dealer fired blank — but Jammer keeps dealer's turn</div>`
+        : `<div class="shot-result blank">○ Dealer fired blank — your turn!</div>`;
     }
   } else {
-    // Dealer shoots self
+    // Dealer shoots self — blank on self does NOT consume dealer jammer
     if (shellType === 'blank') {
       keepTurn = true;
       playLog('Dealer shot itself — BLANK (dealer keeps turn)', 'neutral');
@@ -2140,8 +2176,11 @@ function executeDealerMove(move) {
     } else {
       const actualDmg = Math.min(dmg, gm.dealerLives);
       gm.dealerLives -= actualDmg;
-      playLog(`Dealer shot itself — LIVE (${actualDmg} dmg)`, 'good');
-      recordMove('dealer', `🔫 Shoot Self — LIVE (${actualDmg} dmg)`);
+      // Live self-shot: dealer jammer still gives turn (consumed)
+      const jammered = gm.dealerFx.jammer;
+      if (jammered) { keepTurn = true; gm.dealerFx.jammer = false; }
+      playLog(`Dealer shot itself — LIVE (${actualDmg} dmg)${jammered?' [Jammer]':''}`, 'good');
+      recordMove('dealer', `🔫 Shoot Self — LIVE (${actualDmg} dmg)${jammered?' + Jammer':''}`);
       resultHtml = `<div class="shot-result good">💥 Dealer fires live on itself — ${actualDmg} damage!</div>`;
     }
   }
@@ -2233,6 +2272,248 @@ function toggleHistGame(idx) {
 }
 
 // ── Init ───────────────────────────────────────────────────────────────────
+// ════════════════════════════════════════
+// SOUND FX
+// ════════════════════════════════════════
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let _actx = null;
+function getACtx() {
+  if (!_actx) _actx = new AudioCtx();
+  if (_actx.state === 'suspended') _actx.resume();
+  return _actx;
+}
+
+function playSound(type) {
+  try {
+    const ctx = getACtx();
+    const now = ctx.currentTime;
+    const g = ctx.createGain();
+    g.connect(ctx.destination);
+
+    if (type === 'shoot-live') {
+      // Sharp bang
+      const buf = ctx.createBuffer(1, ctx.sampleRate * 0.18, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) {
+        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 2.5);
+      }
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass'; filter.frequency.value = 900;
+      src.connect(filter); filter.connect(g);
+      g.gain.setValueAtTime(0.9, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+      src.start(now);
+    } else if (type === 'shoot-blank') {
+      // Click/thud
+      const osc = ctx.createOscillator();
+      osc.type = 'sine'; osc.frequency.setValueAtTime(140, now);
+      osc.frequency.exponentialRampToValueAtTime(60, now + 0.06);
+      osc.connect(g);
+      g.gain.setValueAtTime(0.4, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      osc.start(now); osc.stop(now + 0.1);
+    } else if (type === 'item') {
+      // Soft chime
+      const osc = ctx.createOscillator();
+      osc.type = 'triangle'; osc.frequency.value = 660;
+      osc.connect(g);
+      g.gain.setValueAtTime(0.25, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+      osc.start(now); osc.stop(now + 0.25);
+    } else if (type === 'draw') {
+      // Tick
+      const osc = ctx.createOscillator();
+      osc.type = 'square'; osc.frequency.value = 320;
+      osc.connect(g);
+      g.gain.setValueAtTime(0.12, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+      osc.start(now); osc.stop(now + 0.08);
+    } else if (type === 'win') {
+      // Rising arpeggio
+      [440, 554, 659, 880].forEach((f, i) => {
+        const o = ctx.createOscillator();
+        const gn = ctx.createGain();
+        o.type = 'triangle'; o.frequency.value = f;
+        o.connect(gn); gn.connect(ctx.destination);
+        const t = now + i * 0.09;
+        gn.gain.setValueAtTime(0, t);
+        gn.gain.linearRampToValueAtTime(0.22, t + 0.04);
+        gn.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+        o.start(t); o.stop(t + 0.25);
+      });
+    } else if (type === 'lose') {
+      // Descending tones
+      [330, 277, 220].forEach((f, i) => {
+        const o = ctx.createOscillator();
+        const gn = ctx.createGain();
+        o.type = 'sawtooth'; o.frequency.value = f;
+        const filt = ctx.createBiquadFilter();
+        filt.type = 'lowpass'; filt.frequency.value = 600;
+        o.connect(filt); filt.connect(gn); gn.connect(ctx.destination);
+        const t = now + i * 0.12;
+        gn.gain.setValueAtTime(0.18, t);
+        gn.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+        o.start(t); o.stop(t + 0.3);
+      });
+    }
+  } catch(e) {}
+}
+
+// ════════════════════════════════════════
+// PARTICLE SYSTEM
+// ════════════════════════════════════════
+const canvas = document.getElementById('particle-canvas');
+const pctx   = canvas ? canvas.getContext('2d') : null;
+let particles = [];
+let pAnimId = null;
+
+function resizeCanvas() {
+  if (!canvas) return;
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function spawnParticles(type, shellType, ev) {
+  if (!canvas || !pctx) return;
+  // Get position from last clicked button or center
+  let x = window.innerWidth / 2, y = window.innerHeight / 2;
+  const focused = document.activeElement;
+  if (focused && focused.getBoundingClientRect) {
+    const r = focused.getBoundingClientRect();
+    x = r.left + r.width / 2; y = r.top + r.height / 2;
+  }
+  if (ev && ev.clientX) { x = ev.clientX; y = ev.clientY; }
+
+  const isLive = shellType === 'live';
+  const count = isLive ? 28 : 12;
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = isLive ? (2 + Math.random() * 7) : (1 + Math.random() * 3);
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - (isLive ? 2 : 0.5),
+      life: 1,
+      decay: 0.03 + Math.random() * 0.04,
+      size: isLive ? (2 + Math.random() * 4) : (1.5 + Math.random() * 2.5),
+      color: isLive
+        ? `hsl(${10 + Math.random() * 30}, 100%, ${50 + Math.random() * 20}%)`
+        : `hsl(0, 0%, ${50 + Math.random() * 30}%)`
+    });
+  }
+  if (!pAnimId) animParticles();
+}
+
+function spawnItemParticles(x, y) {
+  if (!canvas || !pctx) return;
+  for (let i = 0; i < 14; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 1 + Math.random() * 4;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 1,
+      life: 1,
+      decay: 0.04 + Math.random() * 0.04,
+      size: 1.5 + Math.random() * 2.5,
+      color: `hsl(${40 + Math.random() * 40}, 90%, ${60 + Math.random() * 20}%)`
+    });
+  }
+  if (!pAnimId) animParticles();
+}
+
+function animParticles() {
+  if (!pctx) return;
+  pctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles = particles.filter(p => p.life > 0.01);
+  for (const p of particles) {
+    p.x += p.vx; p.y += p.vy;
+    p.vy += 0.18; // gravity
+    p.life -= p.decay;
+    pctx.globalAlpha = Math.max(0, p.life);
+    pctx.fillStyle = p.color;
+    pctx.beginPath();
+    pctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    pctx.fill();
+  }
+  pctx.globalAlpha = 1;
+  if (particles.length > 0) {
+    pAnimId = requestAnimationFrame(animParticles);
+  } else {
+    pAnimId = null;
+    pctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+// Flash effect on button click
+function flashBtn(el) {
+  if (!el) return;
+  el.classList.remove('btn-flash');
+  void el.offsetWidth; // reflow
+  el.classList.add('btn-flash');
+  setTimeout(() => el.classList.remove('btn-flash'), 200);
+}
+
+// ════════════════════════════════════════
+// HOOK SOUNDS + PARTICLES INTO BUTTONS
+// ════════════════════════════════════════
+// We'll patch the shoot and draw buttons after DOM is ready
+function hookPlayButtons() {
+  const btnD = document.getElementById('btn-shoot-dealer');
+  const btnS = document.getElementById('btn-shoot-self');
+  if (btnD) {
+    btnD._origClick = btnD.onclick;
+    btnD.addEventListener('mousedown', (ev) => {
+      flashBtn(btnD);
+      if (!gm || !gm.isPlayerTurn || gm.gameOver || gm.roundOver) return;
+      const shell = gm.shells[gm.shellIdx];
+      const effective = gm.playerFx.inverter ? (shell==='live'?'blank':'live') : shell;
+      playSound(effective === 'live' ? 'shoot-live' : 'shoot-blank');
+      spawnParticles('shoot-dealer', effective, ev);
+    });
+  }
+  if (btnS) {
+    btnS._origClick = btnS.onclick;
+    btnS.addEventListener('mousedown', (ev) => {
+      flashBtn(btnS);
+      if (!gm || !gm.isPlayerTurn || gm.gameOver || gm.roundOver) return;
+      const shell = gm.shells[gm.shellIdx];
+      const effective = gm.playerFx.inverter ? (shell==='live'?'blank':'live') : shell;
+      playSound(effective === 'live' ? 'shoot-live' : 'shoot-blank');
+      spawnParticles('shoot-self', effective, ev);
+    });
+  }
+}
+
+// Hook item use sounds
+const _origUseItem = useItem;
+window.useItem = function(key) {
+  if (gm && gm.isPlayerTurn && !gm.gameOver && !gm.roundOver && (gm.playerItems[key]||0) > 0) {
+    playSound('item');
+    const chip = document.querySelector(`.use-chip:not(.disabled) span`);
+    // find clicked chip via key
+    const chips = document.querySelectorAll('.use-chip');
+    for (const c of chips) {
+      if (c.querySelector('span') && c.querySelector('span').textContent && c.onclick && c.getAttribute('onclick') && c.getAttribute('onclick').includes(key)) {
+        spawnItemParticles(c.getBoundingClientRect().left + c.offsetWidth/2, c.getBoundingClientRect().top);
+        break;
+      }
+    }
+  }
+  _origUseItem(key);
+};
+
+// Init play buttons after start
+const _origStartGame = startGame;
+window.startGame = function() {
+  _origStartGame();
+  setTimeout(hookPlayButtons, 100);
+};
+
 renderAll();
 renderLog();
 
