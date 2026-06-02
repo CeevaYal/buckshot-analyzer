@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buckshot Analysis</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&display=swap');
+
+  :root {
+    --bg:        #06050300;
+    --bg-page:   #080705;
+    --bg2:       #0f0d09;
+    --bg3:       #141209;
+    --border:    #2a2318;
+    --border2:   #3a3020;
+    --text:      #d4c5a0;
+    --dim:       #5a4f38;
+    --dimmer:    #2a2318;
+    --gold:      #c8a96e;
+    --gold-dim:  #4a3f28;
+    --red:       #e05050;
+    --red-dim:   #8b2020;
+    --red-bg:    rgba(180,30,30,0.12);
+    --green:     #7ab86e;
+    --green-dim: #3a6a30;
+    --blue:      #5090e0;
+    --blue-dim:  #204080;
+    --blue-bg:   rgba(30,80,180,0.12);
+    --purple:    #9080c8;
+    --orange:    #e07a30;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Share Tech Mono', monospace;
+    background: var(--bg-page);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── Layout ── */
+  #wrap {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 16px 96px;
+  }
+
+  /* ── Header ── */
+  .hdr {
+    text-align: center;
+    padding: 22px 0 14px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .hdr-title {
+    font-family: 'Bebas Neue', monospace;
+    font-size: 30px;
+    letter-spacing: 10px;
+    color: var(--gold);
+    text-shadow: 0 0 24px rgba(200,169,110,0.3);
+  }
+  .hdr-sub {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--dim);
+    margin-top: 4px;
+  }
+  #engine-status {
+    margin-top: 6px;
+    font-size: 10px;
+    letter-spacing: 2px;
+  }
+
+  /* ── Section titles ── */
+  .sec-title {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: rgba(0,0,0,0.28);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+  }
+  .card.highlight {
+    border-color: var(--gold);
+    background: rgba(200,169,110,0.04);
+    box-shadow: 0 0 16px rgba(200,169,110,0.08);
+  }
+
+  /* ── Shell editor ── */
+  .shells-editor {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .shells-label { font-size: 10px; letter-spacing: 2px; color: var(--dim); }
+
+  .shell-counter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .shell-count-btn {
+    width: 26px; height: 26px;
+    border-radius: 3px;
+    border: 1px solid var(--border2);
+    background: rgba(255,255,255,0.03);
+    color: var(--text);
+    font-size: 14px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.12s;
+    font-family: inherit;
+    padding: 0;
+  }
+  .shell-count-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .shell-count-val { font-size: 16px; min-width: 22px; text-align: center; color: var(--text); }
+
+  /* Shell sequence visualizer */
+  .shell-seq {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .shell-pip {
+    width: 22px; height: 34px;
+    border-radius: 11px 11px 3px 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+    cursor: pointer;
+    transition: all 0.12s;
+    border: 1px solid transparent;
+    position: relative;
+  }
+  .shell-pip.live {
+    background: linear-gradient(180deg, #c8761a, #8b4a0c);
+    border-color: #e8921e;
+    color: #ffcf80;
+    box-shadow: 0 0 6px rgba(200,118,26,0.4);
+  }
+  .shell-pip.blank {
+    background: linear-gradient(180deg, #3a3a3a, #1a1a1a);
+    border-color: #555;
+    color: #777;
+  }
+  .shell-pip.unknown {
+    background: rgba(255,255,255,0.04);
+    border: 1px dashed var(--border2);
+    color: var(--dimmer);
+    cursor: pointer;
+  }
+  .shell-pip.unknown:hover {
+    border-color: var(--gold-dim);
+    color: var(--gold);
+    background: rgba(200,169,110,0.06);
+    transform: translateY(-2px);
+  }
+  .shell-pip:not(.unknown):hover { transform: translateY(-2px); filter: brightness(1.2); }
+
+  /* Popup for choosing shell type on unknown slot */
+  .shell-popup {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1710;
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 5px;
+    z-index: 200;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+    white-space: nowrap;
+  }
+  .shell-popup button {
+    padding: 4px 10px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    font-family: inherit;
+    border-radius: 3px;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+  .shell-popup .pop-live {
+    border: 1px solid var(--red-dim);
+    background: var(--red-bg);
+    color: var(--red);
+  }
+  .shell-popup .pop-blank {
+    border: 1px solid #444;
+    background: rgba(60,60,60,0.2);
+    color: #888;
+  }
+  .shell-popup .pop-live:hover  { background: rgba(180,30,30,0.22); }
+  .shell-popup .pop-blank:hover { background: rgba(80,80,80,0.3); color: #bbb; }
+  .seq-hint { font-size: 10px; color: var(--dimmer); letter-spacing: 1px; }
+
+  /* ── Two-column panels ── */
+  .panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 520px) { .panels { grid-template-columns: 1fr; } }
+
+  /* ── Lives ── */
+  .lives-row { display: flex; gap: 4px; margin-bottom: 8px; }
+  .heart { font-size: 14px; cursor: pointer; transition: all 0.12s; }
+  .heart.alive:hover { transform: scale(1.2); }
+  .heart.dead { opacity: 0.18; }
+  .lives-counter { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+
+  /* ── Items ── */
+  .items-grid { display: flex; flex-wrap: wrap; gap: 5px; }
+  .item-chip {
+    display: flex; align-items: center; gap: 4px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 3px 8px;
+    font-size: 11px;
+    color: var(--dim);
+    cursor: pointer;
+    transition: all 0.12s;
+    user-select: none;
+  }
+  .item-chip:hover { border-color: var(--gold-dim); color: var(--text); }
+  .item-chip .cnt {
+    font-size: 13px;
+    color: var(--gold);
+    min-width: 10px;
+    text-align: center;
+  }
+  .item-chip .minus {
+    font-size: 10px;
+    color: var(--red);
+    margin-left: 2px;
+    opacity: 0.6;
+    cursor: pointer;
+  }
+  .item-chip .minus:hover { opacity: 1; }
+
+  /* ── Analysis result ── */
+  #result-card {
+    display: none;
+    border-color: var(--gold);
+  }
+  #result-card.visible { display: block; }
+
+  .result-move {
+    font-family: 'Bebas Neue', monospace;
+    font-size: 28px;
+    letter-spacing: 6px;
+    margin-bottom: 6px;
+  }
+  .result-move.shoot  { color: var(--red); }
+  .result-move.self   { color: var(--blue); }
+  .result-move.item   { color: var(--green); }
+
+  .result-detail { font-size: 11px; color: var(--dim); line-height: 1.9; }
+  .result-prob {
+    font-size: 13px;
+    margin-top: 8px;
+  }
+  .prob-bar-wrap {
+    height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 6px;
+    width: 100%;
+  }
+  .prob-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+
+  /* ── Analyze button ── */
+  .analyze-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 14px;
+    letter-spacing: 5px;
+    font-family: 'Bebas Neue', monospace;
+    border-radius: 3px;
+    cursor: pointer;
+    border: 1px solid var(--gold-dim);
+    background: rgba(200,169,110,0.08);
+    color: var(--gold);
+    transition: all 0.15s;
+    margin-bottom: 14px;
+  }
+  .analyze-btn:hover:not(:disabled) {
+    background: rgba(200,169,110,0.16);
+    border-color: var(--gold);
+    box-shadow: 0 0 18px rgba(200,169,110,0.15);
+  }
+  .analyze-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  /* ── Log ── */
+  .log-section {
+    border: 1px solid #1a1812;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.45);
+    max-height: 160px;
+    overflow-y: auto;
+    padding: 8px 12px;
+  }
+  .log-entry {
+    font-size: 11px; line-height: 1.8;
+    border-left: 2px solid var(--dimmer);
+    padding-left: 8px; margin-bottom: 2px;
+    color: var(--dim);
+  }
+  .log-entry.info    { color: var(--gold);   border-left-color: var(--gold-dim); }
+  .log-entry.good    { color: var(--green);  border-left-color: var(--green-dim); }
+  .log-entry.bad     { color: var(--red);    border-left-color: var(--red-dim); }
+  .log-entry.neutral { color: var(--dim);    border-left-color: var(--border); }
+  .log-entry.engine  { color: var(--purple); border-left-color: #4a3080; }
+  .log-empty { font-size: 11px; color: var(--dimmer); }
+
+  .log-section::-webkit-scrollbar { width: 4px; }
+  .log-section::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* ── Status bar ── */
+  #status-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    text-align: center;
+    padding: 8px;
+    font-size: 11px; letter-spacing: 2px;
+    color: var(--gold);
+    border-top: 1px solid var(--border);
+    background: var(--bg-page);
+    z-index: 100;
+  }
+
+  /* ── Whose turn toggle ── */
+  .turn-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .turn-btn {
+    flex: 1;
+    padding: 8px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+  .turn-btn.active-you {
+    border-color: var(--gold-dim);
+    background: rgba(200,169,110,0.1);
+    color: var(--gold);
+  }
+  .turn-btn.active-dealer {
+    border-color: var(--purple);
+    background: rgba(144,128,200,0.1);
+    color: var(--purple);
+  }
+
+  /* ── Reset / Preset buttons ── */
+  .toolbar {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .tool-btn {
+    padding: 6px 12px;
+    font-size: 10px; letter-spacing: 2px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: inherit;
+    text-transform: uppercase;
+    border: 1px solid var(--border2);
+    background: rgba(255,255,255,0.02);
+    color: var(--dim);
+    transition: all 0.12s;
+  }
+  .tool-btn:hover { border-color: var(--gold-dim); color: var(--text); }
+
+  /* ── Shell sequence controls ── */
+  .seq-controls {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .seq-btn {
+    padding: 5px 10px;
+    font-size: 10px; letter-spacing: 1px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: inherit;
+    text-transform: uppercase;
+    transition: all 0.12s;
+  }
+  .seq-btn.live-btn {
+    border: 1px solid var(--red-dim);
+    background: var(--red-bg);
+    color: var(--red);
+  }
+  .seq-btn.blank-btn {
+    border: 1px solid #444;
+    background: rgba(60,60,60,0.2);
+    color: #888;
+  }
+  .seq-btn.live-btn:hover { background: rgba(180,30,30,0.22); }
+  .seq-btn.blank-btn:hover { background: rgba(80,80,80,0.3); color: #bbb; }
+  .seq-btn.unknown-btn {
+    border: 1px dashed var(--border2);
+    background: rgba(255,255,255,0.02);
+    color: var(--dim);
+  }
+  .seq-btn.unknown-btn:hover { border-color: var(--gold-dim); color: var(--gold); background: rgba(200,169,110,0.06); }
+  /* ── Active effects toggles ── */
+  .active-effects-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .effect-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 3px;
+    border: 1px solid var(--border2);
+    background: rgba(255,255,255,0.02);
+    cursor: pointer;
+    transition: all 0.12s;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--dim);
+    user-select: none;
+  }
+  .effect-toggle:hover {
+    border-color: var(--gold-dim);
+    color: var(--text);
+  }
+  .effect-toggle.effect-on {
+    border-color: var(--eff-color, var(--gold));
+    background: color-mix(in srgb, var(--eff-color, var(--gold)) 10%, transparent);
+    color: var(--eff-color, var(--gold));
+    box-shadow: 0 0 8px color-mix(in srgb, var(--eff-color, var(--gold)) 20%, transparent);
+  }
+  .effect-icon { font-size: 13px; }
+  .effect-label { font-size: 10px; letter-spacing: 2px; }
+  .effect-dot { font-size: 10px; opacity: 0.7; }
+
+  .seq-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+</style>
+</head>
+<body>
+<div id="wrap">
+
+  <div class="hdr">
+    <div class="hdr-title">Buckshot Analysis</div>
+    <div class="hdr-sub">POSITION EDITOR · ENGINE EVALUATION</div>
+    <div id="engine-status" style="color:var(--dim)">▸ Loading engine…</div>
+  </div>
+
+  <!-- Whose turn -->
+  <div class="card">
+    <div class="sec-title">Perspective (who is being evaluated)</div>
+    <div class="turn-toggle">
+      <button class="turn-btn active-you"  id="btn-turn-you"    onclick="setTurn('you')">▶ YOUR TURN</button>
+      <button class="turn-btn"             id="btn-turn-dealer" onclick="setTurn('dealer')">DEALER'S TURN ◀</button>
+    </div>
+  </div>
+
+  <!-- Shell Editor -->
+  <div class="card">
+    <div class="sec-title">Shells in chamber</div>
+
+    <div class="shells-editor">
+      <span class="shells-label" style="color:var(--red)">🔴 LIVE</span>
+      <div class="shell-counter">
+        <button class="shell-count-btn" onclick="adjustShell('live',-1)">−</button>
+        <span class="shell-count-val" id="live-val">2</span>
+        <button class="shell-count-btn" onclick="adjustShell('live',+1)">+</button>
+      </div>
+
+      <span class="shells-label" style="margin-left:12px">⚪ BLANK</span>
+      <div class="shell-counter">
+        <button class="shell-count-btn" onclick="adjustShell('blank',-1)">−</button>
+        <span class="shell-count-val" id="blank-val">2</span>
+        <button class="shell-count-btn" onclick="adjustShell('blank',+1)">+</button>
+      </div>
+    </div>
+
+    <div class="sec-title" style="margin-bottom:6px">Shell sequence <span style="color:var(--dimmer)">(optional — click shell pip to toggle/assign, right-click to remove)</span></div>
+    <div class="shell-seq" id="shell-seq"></div>
+
+    <div class="seq-controls">
+      <button class="seq-btn live-btn"   id="seq-add-live"    onclick="seqAdd('live')">+ Live</button>
+      <button class="seq-btn blank-btn"  id="seq-add-blank"   onclick="seqAdd('blank')">+ Blank</button>
+      <button class="seq-btn unknown-btn" id="seq-add-unknown" onclick="seqAddUnknown()">+ ?</button>
+      <button class="tool-btn" onclick="seqClear()">Clear Sequence</button>
+    </div>
+  </div>
+
+  <!-- Panels -->
+  <div class="panels">
+    <!-- YOU -->
+    <div class="card" id="panel-you">
+      <div class="sec-title">▶ You</div>
+      <div class="lives-counter" id="lives-you-ctr"></div>
+      <div class="items-grid" id="items-you"></div>
+    </div>
+    <!-- DEALER -->
+    <div class="card" id="panel-dealer">
+      <div class="sec-title">Dealer ◀</div>
+      <div class="lives-counter" id="lives-dealer-ctr"></div>
+      <div class="items-grid" id="items-dealer"></div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button class="tool-btn" onclick="resetAll()">↺ Reset All</button>
+    <button class="tool-btn" onclick="presetEarly()">Preset: Early Game</button>
+    <button class="tool-btn" onclick="presetTense()">Preset: Tense End</button>
+  </div>
+
+  <!-- Active Effects -->
+  <div class="card">
+    <div class="sec-title">Active effects <span style="color:var(--dimmer)">(items currently in use this turn)</span></div>
+    <div class="panels" style="margin-bottom:0">
+      <div>
+        <div class="sec-title" style="margin-bottom:6px">▶ You</div>
+        <div class="active-effects-row" id="active-effects-you"></div>
+      </div>
+      <div>
+        <div class="sec-title" style="margin-bottom:6px">Dealer ◀</div>
+        <div class="active-effects-row" id="active-effects-dealer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analyze button -->
+  <button class="analyze-btn" id="analyze-btn" onclick="runAnalysis()" disabled>
+    ASK ENGINE
+  </button>
+
+  <!-- Result -->
+  <div class="card highlight" id="result-card">
+    <div class="sec-title">Engine Recommendation</div>
+    <div class="result-move" id="result-move"></div>
+    <div class="result-detail" id="result-detail"></div>
+    <div class="result-prob" id="result-prob"></div>
+    <div class="prob-bar-wrap"><div class="prob-bar" id="prob-bar"></div></div>
+  </div>
+
+  <!-- Log -->
+  <div class="sec-title" style="margin-bottom:6px">Analysis Log</div>
+  <div class="log-section" id="log"></div>
+
+</div>
+
+<div id="status-bar">BUCKSHOT ANALYSIS — SET POSITION, THEN ASK ENGINE</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+const ITEM_META = {
+  saw:        { icon: "🪚", label: "Handsaw",      desc: "Next shot ×2 dmg" },
+  beer:       { icon: "🍺", label: "Beer",         desc: "Eject shell" },
+  cig:        { icon: "🚬", label: "Cigarette",    desc: "+1 life" },
+  inverter:   { icon: "🔀", label: "Inverter",     desc: "Flip shell type" },
+  jammer:     { icon: "📡", label: "Jammer",       desc: "Keep turn on hit" },
+  adrenaline: { icon: "💉", label: "Adrenaline",   desc: "Steal item" },
+  spyglass:   { icon: "🔭", label: "Spyglass",     desc: "Peek next shell" },
+  phone:      { icon: "📱", label: "Burner Phone", desc: "Peek any shell" },
+};
+
+function newItems(lives = 3) {
+  return { lives, saw:0, beer:0, cig:0, inverter:0, jammer:0, adrenaline:0, spyglass:0, phone:0,
+           jammer_using:0, saw_using:false, inverter_using:false };
+}
+
+let st = {
+  dshell: 2,
+  bshell: 2,
+  you: newItems(3),
+  dealer: newItems(3),
+};
+let shellSequence = []; // ordered, optional. index 0 = next to fire. values: "live" | "blank" | "unknown"
+let openPopupIdx = null; // index of currently open unknown-slot popup
+let turnPerspective = "you"; // "you" | "dealer"
+let engineReady = false;
+let platform = null;
+let analyzing = false;
+let logEntries = [];
+
+// ── Active effects (mid-turn state, per person) ───────────────────────────
+let activeEffects = {
+  you:    { jammer_using: 0, saw_using: false, inverter_using: false },
+  dealer: { jammer_using: 0, saw_using: false, inverter_using: false },
+};
+
+// ── Log ───────────────────────────────────────────────────────────────────
+function addLog(msg, type = "neutral") {
+  logEntries = [...logEntries.slice(-80), { msg, type }];
+  renderLog();
+}
+function renderLog() {
+  const el = document.getElementById("log");
+  if (logEntries.length === 0) { el.innerHTML = '<div class="log-empty">— awaiting analysis —</div>'; return; }
+  el.innerHTML = logEntries.map(e => `<div class="log-entry ${e.type}">${esc(e.msg)}</div>`).join("");
+  el.scrollTop = el.scrollHeight;
+}
+function esc(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+// ── Shell adjustments ─────────────────────────────────────────────────────
+function adjustShell(type, delta) {
+  if (type === "live") {
+    st.dshell = Math.max(0, Math.min(8, st.dshell + delta));
+  } else {
+    st.bshell = Math.max(0, Math.min(8, st.bshell + delta));
+  }
+  // Sync sequence: rebuild if total changed and we have a full sequence defined
+  syncSequenceToCount();
+  renderAll();
+}
+
+function syncSequenceToCount() {
+  const total = st.dshell + st.bshell;
+  if (shellSequence.length > total) {
+    shellSequence = shellSequence.slice(0, total);
+  }
+  // Clamp typed shells to declared counts — flip excess to unknown
+  let livePlaced  = 0;
+  let blankPlaced = 0;
+  shellSequence = shellSequence.map(v => {
+    if (v === "live") {
+      if (livePlaced < st.dshell) { livePlaced++; return "live"; }
+      return "unknown";
+    } else if (v === "blank") {
+      if (blankPlaced < st.bshell) { blankPlaced++; return "blank"; }
+      return "unknown";
+    }
+    return v; // unknown stays
+  });
+}
+
+// ── Sequence editor ───────────────────────────────────────────────────────
+function seqAdd(type) {
+  const total = st.dshell + st.bshell;
+  if (shellSequence.length >= total) return;
+  // Check we don't exceed the declared count of that type
+  const cur = shellSequence.filter(x => x === type).length;
+  const cap = type === "live" ? st.dshell : st.bshell;
+  if (cur >= cap) { addLog(`No more ${type} shells to place (declared count is ${cap})`, "neutral"); return; }
+  shellSequence.push(type);
+  openPopupIdx = null;
+  renderAll();
+}
+
+function seqAddUnknown() {
+  const total = st.dshell + st.bshell;
+  if (shellSequence.length >= total) return;
+  shellSequence.push("unknown");
+  openPopupIdx = null;
+  renderAll();
+}
+
+// Called when user clicks a known pip — show toggle/remove options
+function seqPipClick(idx, event) {
+  event.stopPropagation();
+  openPopupIdx = null; // close any open popup first
+  seqToggle(idx);
+}
+
+function seqRemove(idx) {
+  shellSequence.splice(idx, 1);
+  renderAll();
+}
+
+function seqToggle(idx) {
+  const cur = shellSequence[idx];
+  if (cur === "unknown") return; // unknown is handled by popup
+  const next = cur === "live" ? "blank" : "live";
+  // Check cap
+  const cap = next === "live" ? st.dshell : st.bshell;
+  const curCount = shellSequence.filter(x => x === next).length;
+  if (curCount >= cap) { addLog(`Cannot toggle: already at max ${next} count`, "neutral"); return; }
+  shellSequence[idx] = next;
+  renderAll();
+}
+
+// Open popup on unknown slot to let user assign live/blank/keep-unknown
+function seqUnknownClick(idx, event) {
+  event.stopPropagation();
+  openPopupIdx = openPopupIdx === idx ? null : idx;
+  renderSeq();
+}
+
+function seqSetFromPopup(idx, type) {
+  if (type === "unknown") {
+    shellSequence[idx] = "unknown";
+  } else {
+    const cur = shellSequence.filter(x => x === type).length;
+    const cap = type === "live" ? st.dshell : st.bshell;
+    if (cur >= cap) { addLog(`Cannot set: already at max ${type} count (${cap})`, "neutral"); openPopupIdx = null; renderSeq(); return; }
+    shellSequence[idx] = type;
+  }
+  openPopupIdx = null;
+  renderAll();
+}
+
+function toggleEffect(who, key) {
+  if (key === "jammer_using") {
+    activeEffects[who].jammer_using = activeEffects[who].jammer_using ? 0 : 1;
+  } else {
+    activeEffects[who][key] = !activeEffects[who][key];
+  }
+  renderActiveEffects();
+}
+
+function renderActiveEffects() {
+  const defs = [
+    { key: "saw_using",      icon: "🪚", label: "SAW",      color: "var(--orange)" },
+    { key: "jammer_using",   icon: "📡", label: "JAMMER",   color: "var(--purple)" },
+    { key: "inverter_using", icon: "🔀", label: "INVERTER", color: "var(--blue)"   },
+  ];
+
+  for (const who of ["you", "dealer"]) {
+    const container = document.getElementById(`active-effects-${who}`);
+    if (!container) continue;
+    container.innerHTML = defs.map(d => {
+      const active = who === "you"
+        ? (d.key === "jammer_using" ? !!activeEffects[who][d.key] : activeEffects[who][d.key])
+        : (d.key === "jammer_using" ? !!activeEffects[who][d.key] : activeEffects[who][d.key]);
+      return `<div class="effect-toggle ${active ? "effect-on" : ""}"
+        onclick="toggleEffect('${who}','${d.key}')"
+        style="${active ? `--eff-color:${d.color}` : ""}">
+        <span class="effect-icon">${d.icon}</span>
+        <span class="effect-label">${d.label}</span>
+        <span class="effect-dot">${active ? "●" : "○"}</span>
+      </div>`;
+    }).join("");
+  }
+}
+
+function seqClear() {
+    shellSequence = [];
+  openPopupIdx = null;
+  renderAll();
+}
+
+
+// Close popup when clicking outside
+document.addEventListener("click", () => {
+  if (openPopupIdx !== null) { openPopupIdx = null; renderSeq(); }
+});
+
+// ── Turn toggle ───────────────────────────────────────────────────────────
+function setTurn(t) {
+  turnPerspective = t;
+  document.getElementById("btn-turn-you").className    = "turn-btn" + (t === "you"    ? " active-you"    : "");
+  document.getElementById("btn-turn-dealer").className = "turn-btn" + (t === "dealer" ? " active-dealer" : "");
+}
+
+// ── Item editing ──────────────────────────────────────────────────────────
+function adjustItem(who, key, delta) {
+  st[who][key] = Math.max(0, Math.min(3, (st[who][key] || 0) + delta));
+  renderAll();
+}
+function adjustLives(who, delta) {
+  st[who].lives = Math.max(1, Math.min(4, st[who].lives + delta));
+  renderAll();
+}
+
+// ── Presets ───────────────────────────────────────────────────────────────
+function resetAll() {
+  st = { dshell:2, bshell:2, you: newItems(3), dealer: newItems(3) };
+  shellSequence = [];
+  openPopupIdx = null;
+  activeEffects = {
+    you:    { jammer_using: 0, saw_using: false, inverter_using: false },
+    dealer: { jammer_using: 0, saw_using: false, inverter_using: false },
+  };
+  renderAll();
+  document.getElementById("result-card").classList.remove("visible");
+  addLog("Position reset", "neutral");
+}
+function presetEarly() {
+  st = {
+    dshell: 3, bshell: 3,
+    you:    { ...newItems(4), beer:1, cig:1, saw:1 },
+    dealer: { ...newItems(4), beer:1, inverter:1 },
+  };
+  shellSequence = [];
+  openPopupIdx = null;
+  renderAll();
+  document.getElementById("result-card").classList.remove("visible");
+  addLog("Preset loaded: Early Game", "info");
+}
+function presetTense() {
+  st = {
+    dshell: 2, bshell: 1,
+    you:    { ...newItems(1), spyglass:1 },
+    dealer: { ...newItems(2), saw:1, jammer:1 },
+  };
+  shellSequence = [];
+  openPopupIdx = null;
+  renderAll();
+  document.getElementById("result-card").classList.remove("visible");
+  addLog("Preset loaded: Tense End", "info");
+}
+
+// ── Render ────────────────────────────────────────────────────────────────
+function renderAll() {
+  document.getElementById("live-val").textContent  = st.dshell;
+  document.getElementById("blank-val").textContent = st.bshell;
+  renderSeq();
+  renderPanel("you");
+  renderPanel("dealer");
+  renderActiveEffects();
+  updateAnalyzeBtn();
+  renderStatusBar();
+}
+
+function renderSeq() {
+  const total = st.dshell + st.bshell;
+  const seq   = document.getElementById("shell-seq");
+  let html = "";
+
+  // Render all defined positions (including unknown placeholders)
+  for (let i = 0; i < shellSequence.length; i++) {
+    const t = shellSequence[i];
+    if (t === "unknown") {
+      const popOpen = openPopupIdx === i;
+      html += `<div class="shell-pip unknown" title="Click to assign shell type"
+        onclick="seqUnknownClick(${i}, event)"
+        oncontextmenu="event.preventDefault();seqRemove(${i})"
+        style="position:relative">
+        ?
+        ${popOpen ? `<div class="shell-popup" onclick="event.stopPropagation()">
+          <button class="pop-live"  onclick="seqSetFromPopup(${i},'live')">◆ Live</button>
+          <button class="pop-blank" onclick="seqSetFromPopup(${i},'blank')">○ Blank</button>
+        </div>` : ""}
+      </div>`;
+    } else {
+      html += `<div class="shell-pip ${t}" title="Click to toggle, right-click to remove"
+        onclick="seqPipClick(${i}, event)"
+        oncontextmenu="event.preventDefault();seqRemove(${i})">
+        ${t === "live" ? "◆" : "○"}
+      </div>`;
+    }
+  }
+
+  // Remaining slots not yet added to sequence
+  const remaining = total - shellSequence.length;
+  for (let i = 0; i < remaining; i++) {
+    html += `<div class="shell-pip unknown" style="opacity:0.35; cursor:default" title="Use buttons below to add shells">?</div>`;
+  }
+
+  if (total === 0) {
+    html = `<span class="seq-hint">Set shell counts above</span>`;
+  } else {
+    const knownCount = shellSequence.filter(x => x !== "unknown").length;
+    const allFilled  = shellSequence.length === total;
+    const allKnown   = allFilled && knownCount === total;
+    if (allKnown) {
+      html += `<span class="seq-hint" style="color:var(--green-dim); margin-left:4px">✓ Full sequence known</span>`;
+    } else if (shellSequence.length > 0) {
+      html += `<span class="seq-hint" style="margin-left:4px">${knownCount}/${total} known · ${shellSequence.length}/${total} placed</span>`;
+    } else {
+      html += `<span class="seq-hint" style="margin-left:4px">0/${total} placed</span>`;
+    }
+  }
+
+  seq.innerHTML = html;
+
+  // Update seq add buttons
+  const liveFull  = shellSequence.filter(x=>x==="live").length  >= st.dshell || shellSequence.length >= total;
+  const blankFull = shellSequence.filter(x=>x==="blank").length >= st.bshell || shellSequence.length >= total;
+  const unknownFull = shellSequence.length >= total;
+  document.getElementById("seq-add-live").disabled    = liveFull;
+  document.getElementById("seq-add-blank").disabled   = blankFull;
+  document.getElementById("seq-add-unknown").disabled = unknownFull;
+}
+
+function renderPanel(who) {
+  const items = st[who];
+  // Lives
+  const lctr = document.getElementById(`lives-${who}-ctr`);
+  lctr.innerHTML =
+    `<button class="shell-count-btn" onclick="adjustLives('${who}',-1)">−</button>` +
+    `<span style="font-size:14px; margin: 0 4px">` +
+    Array.from({length:4},(_,i)=>`<span class="heart ${i<items.lives?'alive':'dead'}" onclick="adjustLives('${who}',${i+1-items.lives})">${i<items.lives?"♥":"♡"}</span>`).join("") +
+    `</span>` +
+    `<button class="shell-count-btn" onclick="adjustLives('${who}',+1)">+</button>`;
+
+  // Items
+  const igrid = document.getElementById(`items-${who}`);
+  let html = "";
+  for (const [key, meta] of Object.entries(ITEM_META)) {
+    const count = items[key] || 0;
+    html += `<div class="item-chip" onclick="adjustItem('${who}','${key}',+1)" title="${meta.desc}">
+      <span>${meta.icon}</span>
+      <span style="font-size:10px;color:var(--dim)">${meta.label}</span>
+      <span class="cnt">${count}</span>
+      ${count > 0 ? `<span class="minus" onclick="event.stopPropagation();adjustItem('${who}','${key}',-1)">−</span>` : ""}
+    </div>`;
+  }
+  igrid.innerHTML = html;
+}
+
+function updateAnalyzeBtn() {
+  const total = st.dshell + st.bshell;
+  const ok = engineReady && total > 0 && !analyzing;
+  document.getElementById("analyze-btn").disabled = !ok;
+}
+
+function renderStatusBar() {
+  const total = st.dshell + st.bshell;
+  document.getElementById("status-bar").textContent =
+    `${st.dshell}L / ${st.bshell}B · YOU ${st.you.lives}♥ · DEALER ${st.dealer.lives}♥ · ${turnPerspective.toUpperCase()}'S TURN`;
+}
+
+// ── Engine wiring ──────────────────────────────────────────────────────────
+function loadPerson(person, items) {
+  platform.post(`engine s ${person} lives ${items.lives}`);
+  platform.post(`engine s ${person} adrenaline ${items.adrenaline}`);
+  platform.post(`engine s ${person} beer ${items.beer}`);
+  platform.post(`engine s ${person} cig ${items.cig}`);
+  platform.post(`engine s ${person} inverter ${items.inverter}`);
+  platform.post(`engine s ${person} jammer ${items.jammer}`);
+  platform.post(`engine s ${person} phone ${items.phone}`);
+  platform.post(`engine s ${person} saw ${items.saw}`);
+  platform.post(`engine s ${person} spyglass ${items.spyglass}`);
+}
+
+function loadEngine(dshell, bshell, myItems, oppItems) {
+  platform.post("engine init");
+  platform.post(`engine s dshell ${dshell}`);
+  platform.post(`engine s bshell ${bshell}`);
+  loadPerson("my",  myItems);
+  loadPerson("opp", oppItems);
+}
+
+// ── Analysis ───────────────────────────────────────────────────────────────
+function runAnalysis() {
+  if (!engineReady || analyzing) return;
+  const total = st.dshell + st.bshell;
+  if (total === 0) { addLog("No shells in chamber", "neutral"); return; }
+
+  analyzing = true;
+  document.getElementById("analyze-btn").disabled = true;
+  document.getElementById("analyze-btn").textContent = "CALCULATING…";
+  addLog(`Analyzing — ${st.dshell}L / ${st.bshell}B · ${turnPerspective === "you" ? "Your" : "Dealer's"} turn`, "info");
+
+  // Engine always takes "my" perspective for the mover
+  // If evaluating dealer's turn, flip you/dealer
+  const myItems  = turnPerspective === "you" ? { ...st.you }   : { ...st.dealer };
+  const oppItems = turnPerspective === "you" ? { ...st.dealer } : { ...st.you };
+
+  platform.post("engine init");
+
+  loadEngine(st.dshell, st.bshell, myItems, oppItems);
+
+  // ── Active effects ────────────────────────────────────────────────────────
+  // "my" = mover, "opp" = non-mover (same flip as myItems/oppItems above)
+  const myFx  = turnPerspective === "you" ? activeEffects.you    : activeEffects.dealer;
+  const oppFx = turnPerspective === "you" ? activeEffects.dealer : activeEffects.you;
+
+  platform.post(`engine s my ju ${myFx.jammer_using}`);
+  platform.post(`engine s my su ${myFx.saw_using}`);
+  platform.post(`engine s my iu ${myFx.inverter_using}`);
+
+  platform.post(`engine s opp ju ${oppFx.jammer_using}`);
+  platform.post(`engine s opp su ${oppFx.saw_using}`);
+  platform.post(`engine s opp iu ${oppFx.inverter_using}`);
+
+  // ── Phone results (derived from shell sequence) ───────────────────────────
+  // Values: 0=unknown, 1=live, 2=blank, in chamber order.
+  const phoneVec = Array.from({ length: total }, (_, i) => {
+    const s = shellSequence[i];
+    if (s === "live")  return 1;
+    if (s === "blank") return 2;
+    return 0;
+  });
+  // "me" = mover perspective matches "my" above
+  platform.set_phone_vec(phoneVec, "me");
+  if (phoneVec.some(v => v !== 0)) {
+    addLog(`Phone vec: [${phoneVec.join(", ")}]`, "engine");
+  }
+
+  // ── Log active effects ────────────────────────────────────────────────────
+  const fx = [];
+  if (myFx.saw_using)      fx.push(`🪚 Saw (${turnPerspective === "you" ? "You" : "Dealer"})`);
+  if (myFx.jammer_using)   fx.push(`📡 Jammer (${turnPerspective === "you" ? "You" : "Dealer"})`);
+  if (myFx.inverter_using) fx.push(`🔀 Inverter (${turnPerspective === "you" ? "You" : "Dealer"})`);
+  if (oppFx.saw_using)      fx.push(`🪚 Saw (${turnPerspective === "you" ? "Dealer" : "You"})`);
+  if (oppFx.jammer_using)   fx.push(`📡 Jammer (${turnPerspective === "you" ? "Dealer" : "You"})`);
+  if (oppFx.inverter_using) fx.push(`🔀 Inverter (${turnPerspective === "you" ? "Dealer" : "You"})`);
+  if (fx.length) addLog(`Active effects: ${fx.join(" · ")}`, "engine");
+
+  const reply = platform.post("engine go").split(" ");
+  const move  = reply[0];
+  const winPct = Number(reply[1]);
+
+  addLog(`Engine output: "${move}" · win ${winPct}%`, "engine");
+
+  showResult(move, winPct);
+
+  analyzing = false;
+  document.getElementById("analyze-btn").disabled = false;
+  document.getElementById("analyze-btn").textContent = "ASK ENGINE";
+}
+
+const MOVE_LABELS = {
+  shootopp:         { label: "SHOOT DEALER",   cls: "shoot",  explain: "The engine recommends shooting the dealer this turn." },
+  shootself:        { label: "SHOOT YOURSELF", cls: "self",   explain: "A blank is likely in the chamber — shoot yourself to keep your turn." },
+  usebeer:          { label: "USE BEER",        cls: "item",   explain: "Eject the current shell before committing to a shot." },
+  usecig:           { label: "USE CIGARETTE",   cls: "item",   explain: "Heal 1 life before taking action." },
+  usesaw:           { label: "USE HANDSAW",     cls: "item",   explain: "Activate the saw to deal 2× damage on the next shot." },
+  usejammer:        { label: "USE JAMMER",      cls: "item",   explain: "Activate jammer — keep turn even after hitting the dealer." },
+  useinverter:      { label: "USE INVERTER",    cls: "item",   explain: "Flip the current shell type before shooting." },
+  usespyglass:      { label: "USE SPYGLASS",    cls: "item",   explain: "Peek the current chamber shell before deciding." },
+  usephone:         { label: "USE BURNER PHONE",cls: "item",   explain: "Gather information about a shell further down the chamber." },
+};
+
+function showResult(move, winPct) {
+  const mv = move.toLowerCase().replace(/^use(adrenaline.*)/, "useadrenaline");
+  const meta = MOVE_LABELS[mv] || { label: move.toUpperCase(), cls: "item", explain: "" };
+
+  const card  = document.getElementById("result-card");
+  const mEl   = document.getElementById("result-move");
+  const dEl   = document.getElementById("result-detail");
+  const pEl   = document.getElementById("result-prob");
+  const bar   = document.getElementById("prob-bar");
+
+  mEl.textContent  = meta.label;
+  mEl.className    = "result-move " + meta.cls;
+
+  let detail = meta.explain;
+  if (mv.startsWith("useadrenaline")) {
+    const tool = mv.replace("useadrenaline", "").replace("_", "");
+    const tm = ITEM_META[tool];
+    detail = tm ? `Steal ${tm.icon} ${tm.label} from the opponent.` : "Steal an item via Adrenaline.";
+  }
+  dEl.textContent = detail;
+
+  const col = winPct >= 60 ? "var(--green)" : winPct <= 40 ? "var(--red)" : "var(--gold)";
+  pEl.innerHTML = `Win probability after best play: <span style="color:${col}; font-size:15px">${winPct}%</span>`;
+  bar.style.width      = winPct + "%";
+  bar.style.background = col;
+
+  card.classList.add("visible");
+  card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+renderAll();
+renderLog();
+
+(async () => {
+  try {
+    const { default: init, Interface } = await import("./buckshot.js");
+    await init();
+    platform = new Interface();
+    platform.post("engine init");
+    engineReady = true;
+    document.getElementById("engine-status").textContent = "▸ Engine ready";
+    document.getElementById("engine-status").style.color = "var(--green)";
+    addLog("Buckshot engine loaded and ready", "good");
+    updateAnalyzeBtn();
+  } catch(e) {
+    document.getElementById("engine-status").textContent = "▸ Engine not found (buckshot.js / buckshot.wasm missing)";
+    document.getElementById("engine-status").style.color = "var(--red)";
+    addLog("Engine failed to load: " + e.message, "bad");
+    addLog("Place buckshot.js and buckshot.wasm in the same directory", "neutral");
+  }
+})();
+</script>
+</body>
+</html>
