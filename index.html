@@ -1632,7 +1632,7 @@ function renderPlayItems(gridId, items, isPlayer) {
   for (const [key, meta] of Object.entries(ITEM_META)) {
     const count = items[key] || 0;
     if (!isPlayer && count === 0) continue; // hide zero dealer items
-    const disabled = !isPlayer || count === 0 || !gm.isPlayerTurn || gm.gameOver;
+    const disabled = !isPlayer || count === 0 || !gm.isPlayerTurn || gm.gameOver || (key === 'cig' && gm.playerLives <= 1);
     const tip = (isPlayer && !disabled) ? `data-tip="${meta.desc}"` : '';
     if (key === 'adrenaline' && isPlayer && count > 0) {
       // Render with steal popup — stop propagation so document click doesn't immediately close it
@@ -1708,8 +1708,8 @@ function useItem(key) {
     gm.spyglassRevealed = null; gm.phoneRevealed = null;
     if (gm.shellIdx >= gm.shells.length) { reloadChamber(); return; }
   } else if (key === 'cig') {
-    if (gm.playerLives < gm.maxLives) { gm.playerLives++; playLog('You used 🚬 Cigarette — +1 life', 'good'); }
-    else playLog('You used 🚬 Cigarette — already at max lives', 'neutral');
+    if (gm.playerLives < gm.maxLives && gm.playerLives > 1) { gm.playerLives++; playLog('You used 🚬 Cigarette — +1 life', 'good'); }
+    else playLog('You used 🚬 Cigarette — already at 1 or max lives', 'neutral');
     recordMove('player', '🚬 Cigarette');
   } else if (key === 'saw') {
     gm.playerFx.saw = true;
@@ -2058,7 +2058,7 @@ function executeDealerMove(move) {
   } else if (mv === 'usecig') {
     if ((gm.dealerItems.cig||0) > 0) {
       gm.dealerItems.cig--;
-      if (gm.dealerLives < gm.maxLives) gm.dealerLives++;
+      if (gm.dealerLives < gm.maxLives && gm.dealerLives > 1) gm.dealerLives++;
       playLog('Dealer used 🚬 Cigarette', 'neutral');
       recordMove('dealer', '🚬 Cigarette');
       renderPlay();
