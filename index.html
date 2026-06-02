@@ -1632,7 +1632,8 @@ function renderPlayItems(gridId, items, isPlayer) {
   for (const [key, meta] of Object.entries(ITEM_META)) {
     const count = items[key] || 0;
     if (!isPlayer && count === 0) continue; // hide zero dealer items
-    const disabled = !isPlayer || count === 0 || !gm.isPlayerTurn || gm.gameOver || (key === 'cig' && gm.playerLives <= 1);
+    const phoneUnavail = key === 'phone' && (gm.shellIdx + 1 >= gm.shells.length);
+    const disabled = !isPlayer || count === 0 || !gm.isPlayerTurn || gm.gameOver || (key === 'cig' && gm.playerLives <= 1) || phoneUnavail;
     const tip = (isPlayer && !disabled) ? `data-tip="${meta.desc}"` : '';
     if (key === 'adrenaline' && isPlayer && count > 0) {
       // Render with steal popup — stop propagation so document click doesn't immediately close it
@@ -1806,6 +1807,15 @@ function playerShoot(target) {
   if (checkDeath()) return;
 
   if (gm.shellIdx >= gm.shells.length) {
+    // Deterministic turn on last shell:
+    // shoot opp (live or blank) → opponent's turn
+    // shoot self blank          → my turn
+    // shoot self live           → opponent's turn
+    if (target === 'self' && shellType === 'blank') {
+      gm.isPlayerTurn = true;
+    } else {
+      gm.isPlayerTurn = false;
+    }
     setTimeout(reloadChamber, 800);
     return;
   }
@@ -2134,10 +2144,11 @@ function executeDealerMove(move) {
     }
   }
 
-  // Shoot
+  // Shoot — capture saw damage now (flag may have been set earlier this turn)
   let shellType = gm.shells[gm.shellIdx];
-  if (gm.dealerFx.inverter) { shellType = shellType==='live'?'blank':'live'; gm.dealerFx.inverter=false; }
+  if (gm.dealerFx.inverter) { shellType = shellType==='live'?'blank':'live'; gm.dealerFx.inverter = false; }
   const dmg = gm.dealerFx.saw ? 2 : 1;
+  if (gm.dealerFx.saw) { playLog(`🪚 Dealer saw active — dealing ${dmg} damage`, 'neutral'); }
   gm.dealerFx.saw = false;
   gm.shellIdx++;
   gm.spyglassRevealed = null; gm.phoneRevealed = null;
@@ -2188,7 +2199,22 @@ function executeDealerMove(move) {
   showShotResult(resultHtml);
   if (checkDeath()) return;
 
-  if (gm.shellIdx >= gm.shells.length) { setTimeout(reloadChamber, 800); return; }
+  if (gm.shellIdx >= gm.shells.length) {
+    // Deterministic turn on last shell (dealer perspective):
+    // dealer shoot opp (live or blank) → player's turn (isPlayerTurn = true)
+    // dealer shoot self blank           → dealer's turn (isPlayerTurn = false)
+    // dealer shoot self live            → player's turn (isPlayerTurn = true)
+    if (shootsSelf && shellType === 'blank') {
+      gm.isPlayerTurn = false;
+      renderPlay();
+      setTimeout(reloadChamber, 800);
+      setTimeout(runDealerTurn, 1300);
+    } else {
+      gm.isPlayerTurn = true;
+      setTimeout(reloadChamber, 800);
+    }
+    return;
+  }
 
   if (!keepTurn) {
     gm.isPlayerTurn = true;
