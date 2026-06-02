@@ -8,2209 +8,1091 @@
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&display=swap');
 
   :root {
-    --bg:        #06050300;
-    --bg-page:   #080705;
-    --bg2:       #0f0d09;
-    --bg3:       #141209;
-    --border:    #2a2318;
-    --border2:   #3a3020;
-    --text:      #d4c5a0;
-    --dim:       #5a4f38;
-    --dimmer:    #2a2318;
-    --gold:      #c8a96e;
-    --gold-dim:  #4a3f28;
-    --red:       #e05050;
-    --red-dim:   #8b2020;
-    --red-bg:    rgba(180,30,30,0.12);
-    --green:     #7ab86e;
+    --bg: #080705;
+    --bg2: #0f0d09;
+    --bg3: #141209;
+    --border: #2a2318;
+    --border2: #3a3020;
+    --text: #d4c5a0;
+    --text-dim: #5a4f38;
+    --text-dimmer: #2a2318;
+    --gold: #c8a96e;
+    --gold-dim: #4a3f28;
+    --red: #e05050;
+    --red-dim: #8b2020;
+    --green: #7ab86e;
     --green-dim: #3a6a30;
-    --blue:      #5090e0;
-    --blue-dim:  #204080;
-    --blue-bg:   rgba(30,80,180,0.12);
-    --purple:    #9080c8;
-    --orange:    #e07a30;
+    --blue: #5090e0;
+    --blue-dim: #204080;
+    --purple: #9080c8;
+    --purple-dim: #4a3080;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Share Tech Mono', monospace;
-    background: var(--bg-page);
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    background: var(--bg);
     color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
   }
 
+  /* Scanlines */
   body::after {
     content: '';
-    position: fixed; inset: 0;
-    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px);
+    position: fixed;
+    inset: 0;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
     pointer-events: none;
-    z-index: 9999;
+    z-index: 999;
   }
 
-  #wrap {
-    max-width: 780px;
+  #app {
+    max-width: 720px;
     margin: 0 auto;
-    padding: 0 16px 96px;
+    padding: 0 16px 80px;
   }
 
-  .hdr {
+  /* Header */
+  .header {
     text-align: center;
-    padding: 22px 0 14px;
+    padding: 20px 0 10px;
     border-bottom: 1px solid var(--border);
-    margin-bottom: 0;
   }
-  .hdr-title {
+  .title {
     font-family: 'Bebas Neue', monospace;
-    font-size: 30px;
+    font-size: 32px;
     letter-spacing: 10px;
     color: var(--gold);
-    text-shadow: 0 0 24px rgba(200,169,110,0.3);
+    text-shadow: 0 0 24px rgba(200,169,110,0.35);
   }
-  .hdr-sub {
-    font-size: 10px;
+  .subtitle {
+    font-size: 11px;
     letter-spacing: 4px;
-    color: var(--dim);
+    color: var(--text-dim);
     margin-top: 4px;
   }
-  #engine-status {
-    margin-top: 6px;
-    font-size: 10px;
-    letter-spacing: 2px;
-  }
-
-  /* ── Tabs ── */
-  .tab-bar {
-    display: flex;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 20px;
-    background: rgba(0,0,0,0.3);
-  }
-  .tab-btn {
-    padding: 11px 20px;
+  #turn-indicator {
     font-size: 11px;
     letter-spacing: 3px;
-    font-family: 'Bebas Neue', monospace;
+    color: var(--text-dim);
+    margin-top: 4px;
+    transition: color 0.3s;
+  }
+
+  /* Setup screen */
+  #setup-screen {
+    text-align: center;
+    padding-top: 60px;
+  }
+  .setup-desc {
+    color: var(--text-dim);
     font-size: 13px;
-    cursor: pointer;
-    border: none;
-    background: transparent;
-    color: var(--dim);
-    text-transform: uppercase;
-    transition: all 0.15s;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
+    line-height: 2;
+    max-width: 360px;
+    margin: 32px auto;
   }
-  .tab-btn:hover { color: var(--text); }
-  .tab-btn.active {
-    color: var(--gold);
-    border-bottom-color: var(--gold);
-  }
-  .tab-pane { display: none; }
-  .tab-pane.active { display: block; }
 
-  /* ── Section titles ── */
-  .sec-title {
+  /* Shells */
+  .shells-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 16px 0;
+    flex-wrap: wrap;
+  }
+  .shells-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    margin-right: 4px;
+  }
+  .shell {
+    width: 28px;
+    height: 44px;
+    border-radius: 14px 14px 4px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 10px;
-    letter-spacing: 3px;
-    color: var(--dim);
-    text-transform: uppercase;
-    margin-bottom: 10px;
+    cursor: default;
   }
-
-  /* ── Card ── */
-  .card {
-    background: rgba(0,0,0,0.28);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 14px 16px;
-    margin-bottom: 14px;
-  }
-  .card.highlight {
-    border-color: var(--gold);
-    background: rgba(200,169,110,0.04);
-    box-shadow: 0 0 16px rgba(200,169,110,0.08);
-  }
-
-  /* ── Shell editor ── */
-  .shells-editor {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-  }
-  .shells-label { font-size: 10px; letter-spacing: 2px; color: var(--dim); }
-
-  .shell-counter {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .shell-count-btn {
-    width: 26px; height: 26px;
-    border-radius: 3px;
-    border: 1px solid var(--border2);
-    background: rgba(255,255,255,0.03);
-    color: var(--text);
-    font-size: 14px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.12s;
-    font-family: inherit;
-    padding: 0;
-  }
-  .shell-count-btn:hover { border-color: var(--gold); color: var(--gold); }
-  .shell-count-val { font-size: 16px; min-width: 22px; text-align: center; color: var(--text); }
-
-  .shell-seq {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-  }
-  .shell-pip {
-    width: 22px; height: 34px;
-    border-radius: 11px 11px 3px 3px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 9px;
-    cursor: pointer;
-    transition: all 0.12s;
-    border: 1px solid transparent;
-    position: relative;
-  }
-  .shell-pip.live {
-    background: linear-gradient(180deg, #c8761a, #8b4a0c);
-    border-color: #e8921e;
+  .shell.live {
+    background: linear-gradient(180deg, #c8761a 0%, #8b4a0c 100%);
+    border: 1px solid #e8921e;
     color: #ffcf80;
-    box-shadow: 0 0 6px rgba(200,118,26,0.4);
+    box-shadow: 0 0 8px rgba(200,118,26,0.45);
   }
-  .shell-pip.blank {
-    background: linear-gradient(180deg, #3a3a3a, #1a1a1a);
-    border-color: #555;
-    color: #777;
-  }
-  .shell-pip.unknown {
-    background: rgba(255,255,255,0.04);
-    border: 1px dashed var(--border2);
-    color: var(--dimmer);
-    cursor: pointer;
-  }
-  .shell-pip.unknown:hover {
-    border-color: var(--gold-dim);
-    color: var(--gold);
-    background: rgba(200,169,110,0.06);
-    transform: translateY(-2px);
-  }
-  .shell-pip:not(.unknown):hover { transform: translateY(-2px); filter: brightness(1.2); }
-
-  .shell-popup {
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: #1a1710;
-    border: 1px solid var(--border2);
-    border-radius: 4px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding: 5px;
-    z-index: 200;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.6);
-    white-space: nowrap;
-  }
-  .shell-popup button {
-    padding: 4px 10px;
-    font-size: 10px;
-    letter-spacing: 1px;
-    font-family: inherit;
-    border-radius: 3px;
-    cursor: pointer;
-    text-transform: uppercase;
-  }
-  .shell-popup .pop-live {
-    border: 1px solid var(--red-dim);
-    background: var(--red-bg);
-    color: var(--red);
-  }
-  .shell-popup .pop-blank {
-    border: 1px solid #444;
-    background: rgba(60,60,60,0.2);
+  .shell.blank {
+    background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 100%);
+    border: 1px solid #555;
     color: #888;
   }
-  .shell-popup .pop-live:hover  { background: rgba(180,30,30,0.22); }
-  .shell-popup .pop-blank:hover { background: rgba(80,80,80,0.3); color: #bbb; }
-  .seq-hint { font-size: 10px; color: var(--dimmer); letter-spacing: 1px; }
+  .shells-count {
+    font-size: 11px;
+    color: #3a3020;
+    margin-left: 4px;
+  }
 
+  /* Win odds */
+  .win-odds {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  #win-odds-text {
+    font-size: 11px;
+    letter-spacing: 2px;
+    transition: color 0.3s;
+  }
+
+  /* Panels */
   .panels {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
-    margin-bottom: 14px;
+    margin: 16px 0;
   }
-  @media (max-width: 520px) { .panels { grid-template-columns: 1fr; } }
-
-  .lives-row { display: flex; gap: 4px; margin-bottom: 8px; }
-  .heart { font-size: 14px; cursor: pointer; transition: all 0.12s; }
-  .heart.alive:hover { transform: scale(1.2); }
-  .heart.dead { opacity: 0.18; }
-  .lives-counter { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
-
-  .items-grid { display: flex; flex-wrap: wrap; gap: 5px; }
-  .item-chip {
-    display: flex; align-items: center; gap: 4px;
-    background: rgba(255,255,255,0.03);
+  .panel {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    transition: all 0.3s;
+  }
+  .panel.active {
+    background: rgba(200,169,110,0.04);
+    border-color: var(--gold);
+    box-shadow: 0 0 12px rgba(200,169,110,0.1);
+  }
+  .panel-title {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .lives-row {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  .heart {
+    width: 16px;
+    height: 16px;
+    font-size: 14px;
+  }
+  .heart.dead { opacity: 0.15; }
+  .items-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .item-badge {
+    background: rgba(255,255,255,0.04);
     border: 1px solid var(--border);
     border-radius: 3px;
-    padding: 3px 8px;
+    padding: 3px 6px;
     font-size: 11px;
-    color: var(--dim);
-    cursor: pointer;
-    transition: all 0.12s;
-    user-select: none;
+    color: var(--text-dim);
+    white-space: nowrap;
   }
-  .item-chip:hover { border-color: var(--gold-dim); color: var(--text); }
-  .item-chip .cnt {
-    font-size: 13px;
-    color: var(--gold);
-    min-width: 10px;
-    text-align: center;
-  }
-  .item-chip .minus {
-    font-size: 10px;
-    color: var(--red);
-    margin-left: 2px;
-    opacity: 0.6;
-    cursor: pointer;
-  }
-  .item-chip .minus:hover { opacity: 1; }
-
-  #result-card {
-    display: none;
+  .item-badge.active {
+    background: rgba(200,169,110,0.15);
     border-color: var(--gold);
+    color: var(--gold);
   }
-  #result-card.visible { display: block; }
-
-  .result-move {
-    font-family: 'Bebas Neue', monospace;
-    font-size: 28px;
-    letter-spacing: 6px;
-    margin-bottom: 6px;
+  .no-items {
+    font-size: 11px;
+    color: var(--text-dimmer);
   }
-  .result-move.shoot  { color: var(--red); }
-  .result-move.self   { color: var(--blue); }
-  .result-move.item   { color: var(--green); }
 
-  .result-detail { font-size: 11px; color: var(--dim); line-height: 1.9; }
-  .result-prob {
-    font-size: 13px;
+  /* Action area */
+  .action-area {
+    margin: 16px 0;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px;
+    background: rgba(0,0,0,0.3);
+  }
+  .action-title {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .btn-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .warnings {
     margin-top: 8px;
-  }
-  .prob-bar-wrap {
-    height: 6px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 3px;
-    overflow: hidden;
-    margin-top: 6px;
-    width: 100%;
-  }
-  .prob-bar {
-    height: 100%;
-    border-radius: 3px;
-    transition: width 0.5s ease;
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
 
-  .analyze-btn {
-    width: 100%;
-    padding: 14px;
-    font-size: 14px;
-    letter-spacing: 5px;
-    font-family: 'Bebas Neue', monospace;
+  /* Buttons */
+  button {
+    padding: 8px 14px;
+    font-size: 12px;
+    letter-spacing: 1px;
     border-radius: 3px;
     cursor: pointer;
-    border: 1px solid var(--gold-dim);
-    background: rgba(200,169,110,0.08);
-    color: var(--gold);
     transition: all 0.15s;
-    margin-bottom: 14px;
+    font-family: inherit;
+    text-transform: uppercase;
+    background: rgba(200,169,110,0.08);
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
   }
-  .analyze-btn:hover:not(:disabled) {
-    background: rgba(200,169,110,0.16);
-    border-color: var(--gold);
-    box-shadow: 0 0 18px rgba(200,169,110,0.15);
+  button:hover:not(:disabled) { filter: brightness(1.2); }
+  button:disabled {
+    background: transparent;
+    border-color: #1a1a1a;
+    color: var(--text-dimmer);
+    cursor: not-allowed;
   }
-  .analyze-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-shoot {
+    background: rgba(180,30,30,0.15);
+    border-color: var(--red-dim);
+    color: var(--red);
+  }
+  .btn-self {
+    background: rgba(30,80,180,0.12);
+    border-color: var(--blue-dim);
+    color: var(--blue);
+  }
+  .btn-begin {
+    font-size: 14px;
+    padding: 12px 32px;
+    letter-spacing: 4px;
+    background: rgba(180,30,30,0.15);
+    border-color: var(--red-dim);
+    color: var(--red);
+  }
+  .btn-begin:hover { background: rgba(180,30,30,0.25); }
 
+  /* Log */
   .log-section {
+    margin: 16px 0;
     border: 1px solid #1a1812;
     border-radius: 4px;
-    background: rgba(0,0,0,0.45);
+    background: rgba(0,0,0,0.5);
     max-height: 160px;
     overflow-y: auto;
     padding: 8px 12px;
   }
-  .log-entry {
-    font-size: 11px; line-height: 1.8;
-    border-left: 2px solid var(--dimmer);
-    padding-left: 8px; margin-bottom: 2px;
-    color: var(--dim);
+  .log-empty {
+    font-size: 11px;
+    color: var(--text-dimmer);
   }
-  .log-entry.info    { color: var(--gold);   border-left-color: var(--gold-dim); }
-  .log-entry.good    { color: var(--green);  border-left-color: var(--green-dim); }
-  .log-entry.bad     { color: var(--red);    border-left-color: var(--red-dim); }
-  .log-entry.neutral { color: var(--dim);    border-left-color: var(--border); }
-  .log-entry.engine  { color: var(--purple); border-left-color: #4a3080; }
-  .log-empty { font-size: 11px; color: var(--dimmer); }
+  .log-entry {
+    font-size: 11px;
+    line-height: 1.8;
+    border-left: 2px solid var(--text-dimmer);
+    padding-left: 8px;
+    margin-bottom: 2px;
+    color: var(--text-dim);
+  }
+  .log-entry.damage { color: var(--red); border-left-color: var(--red-dim); }
+  .log-entry.good { color: var(--green); border-left-color: var(--green-dim); }
+  .log-entry.info { color: var(--gold); border-left-color: var(--gold-dim); }
+  .log-entry.opp { color: var(--purple); border-left-color: var(--purple-dim); }
+  .log-entry.neutral { color: var(--text-dim); border-left-color: var(--border); }
 
-  .log-section::-webkit-scrollbar { width: 4px; }
-  .log-section::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
+  /* Status bar */
   #status-bar {
-    position: fixed; bottom: 0; left: 0; right: 0;
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
     text-align: center;
     padding: 8px;
-    font-size: 11px; letter-spacing: 2px;
+    font-size: 12px;
+    letter-spacing: 2px;
     color: var(--gold);
     border-top: 1px solid var(--border);
-    background: var(--bg-page);
+    background: var(--bg);
+    z-index: 50;
+  }
+
+  /* Modal */
+  #steal-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    align-items: center;
+    justify-content: center;
     z-index: 100;
   }
-
-  .turn-toggle {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
+  #steal-modal.open { display: flex; }
+  .modal-box {
+    background: var(--bg2);
+    border: 1px solid var(--gold-dim);
+    border-radius: 4px;
+    padding: 24px;
+    max-width: 340px;
+    width: 90%;
   }
-  .turn-btn {
-    flex: 1;
-    padding: 8px;
-    font-size: 11px;
-    letter-spacing: 2px;
-    border-radius: 3px;
-    cursor: pointer;
-    font-family: inherit;
-    transition: all 0.15s;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--dim);
-    text-transform: uppercase;
-  }
-  .turn-btn.active-you {
-    border-color: var(--gold-dim);
-    background: rgba(200,169,110,0.1);
+  .modal-title {
+    font-size: 13px;
+    letter-spacing: 3px;
     color: var(--gold);
+    margin-bottom: 16px;
   }
-  .turn-btn.active-dealer {
-    border-color: var(--purple);
-    background: rgba(144,128,200,0.1);
-    color: var(--purple);
-  }
-
-  .toolbar {
-    display: flex; gap: 8px; flex-wrap: wrap;
-    margin-bottom: 14px;
-  }
-  .tool-btn {
-    padding: 6px 12px;
-    font-size: 10px; letter-spacing: 2px;
-    border-radius: 3px;
-    cursor: pointer;
-    font-family: inherit;
-    text-transform: uppercase;
-    border: 1px solid var(--border2);
-    background: rgba(255,255,255,0.02);
-    color: var(--dim);
-    transition: all 0.12s;
-  }
-  .tool-btn:hover { border-color: var(--gold-dim); color: var(--text); }
-
-  .seq-controls {
-    display: flex; gap: 6px; flex-wrap: wrap;
-    margin-top: 10px;
-  }
-  .seq-btn {
-    padding: 5px 10px;
-    font-size: 10px; letter-spacing: 1px;
-    border-radius: 3px;
-    cursor: pointer;
-    font-family: inherit;
-    text-transform: uppercase;
-    transition: all 0.12s;
-  }
-  .seq-btn.live-btn {
-    border: 1px solid var(--red-dim);
-    background: var(--red-bg);
-    color: var(--red);
-  }
-  .seq-btn.blank-btn {
-    border: 1px solid #444;
-    background: rgba(60,60,60,0.2);
-    color: #888;
-  }
-  .seq-btn.live-btn:hover { background: rgba(180,30,30,0.22); }
-  .seq-btn.blank-btn:hover { background: rgba(80,80,80,0.3); color: #bbb; }
-  .seq-btn.unknown-btn {
-    border: 1px dashed var(--border2);
-    background: rgba(255,255,255,0.02);
-    color: var(--dim);
-  }
-  .seq-btn.unknown-btn:hover { border-color: var(--gold-dim); color: var(--gold); background: rgba(200,169,110,0.06); }
-  .active-effects-row {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .effect-toggle {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border-radius: 3px;
-    border: 1px solid var(--border2);
-    background: rgba(255,255,255,0.02);
-    cursor: pointer;
-    transition: all 0.12s;
+  .modal-desc {
     font-size: 11px;
-    letter-spacing: 1px;
-    color: var(--dim);
-    user-select: none;
-  }
-  .effect-toggle:hover {
-    border-color: var(--gold-dim);
-    color: var(--text);
-  }
-  .effect-toggle.effect-on {
-    border-color: var(--eff-color, var(--gold));
-    background: color-mix(in srgb, var(--eff-color, var(--gold)) 10%, transparent);
-    color: var(--eff-color, var(--gold));
-    box-shadow: 0 0 8px color-mix(in srgb, var(--eff-color, var(--gold)) 20%, transparent);
-  }
-  .effect-icon { font-size: 13px; }
-  .effect-label { font-size: 10px; letter-spacing: 2px; }
-  .effect-dot { font-size: 10px; opacity: 0.7; }
-  .seq-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-  /* ═══════════════════════════════════
-     PLAY MODE STYLES
-  ══════════════════════════════════ */
-
-  /* Round / lives header */
-  .play-hdr {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 12px 16px;
-    background: rgba(0,0,0,0.35);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    margin-bottom: 14px;
-    flex-wrap: wrap;
-  }
-  .play-hdr-block { text-align: center; }
-  .play-hdr-label {
-    font-size: 9px; letter-spacing: 3px; color: var(--dim);
-    text-transform: uppercase; margin-bottom: 3px;
-  }
-  .play-hdr-val {
-    font-family: 'Bebas Neue', monospace;
-    font-size: 22px; letter-spacing: 4px;
-  }
-  .play-hdr-val.gold { color: var(--gold); }
-  .play-hdr-val.red  { color: var(--red);  }
-  .play-hdr-val.blue { color: var(--blue); }
-  .play-hdr-val.green{ color: var(--green);}
-
-  .hearts-row { display: flex; gap: 3px; justify-content: center; margin-top: 2px; }
-  .ph { font-size: 16px; transition: all 0.15s; }
-  .ph.alive { color: var(--red); filter: drop-shadow(0 0 4px rgba(220,80,80,0.5)); }
-  .ph.dead  { color: var(--dimmer); }
-
-  /* Chamber display */
-  .chamber-wrap {
-    background: rgba(0,0,0,0.35);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 14px 16px;
-    margin-bottom: 14px;
-  }
-  .chamber-shells {
-    display: flex; gap: 6px; flex-wrap: wrap;
-    margin-top: 10px; margin-bottom: 8px;
-  }
-  .ch-pip {
-    width: 24px; height: 38px;
-    border-radius: 12px 12px 3px 3px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px;
-    border: 1px solid transparent;
-    transition: all 0.2s;
-  }
-  .ch-pip.live {
-    background: linear-gradient(180deg, #c8761a, #8b4a0c);
-    border-color: #e8921e;
-    color: #ffcf80;
-    box-shadow: 0 0 8px rgba(200,118,26,0.5);
-  }
-  .ch-pip.blank {
-    background: linear-gradient(180deg, #3a3a3a, #1a1a1a);
-    border-color: #555;
-    color: #777;
-  }
-  .ch-pip.hidden {
-    background: rgba(255,255,255,0.04);
-    border: 1px dashed var(--border2);
-    color: var(--dimmer);
-  }
-  .ch-pip.fired {
-    opacity: 0.2;
-    transform: scale(0.85);
-  }
-  .ch-pip.next-shell {
-    box-shadow: 0 0 0 2px var(--gold), 0 0 12px rgba(200,169,110,0.3);
-    transform: translateY(-4px);
-  }
-
-  /* Action buttons */
-  .action-area {
-    background: rgba(0,0,0,0.28);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 14px 16px;
-    margin-bottom: 14px;
-  }
-  .action-btns {
-    display: flex; gap: 8px; flex-wrap: wrap;
+    color: var(--text-dim);
     margin-bottom: 12px;
   }
-  .act-btn {
-    padding: 10px 16px;
-    font-size: 11px; letter-spacing: 2px;
-    font-family: 'Bebas Neue', monospace;
-    font-size: 14px;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: all 0.15s;
-    text-transform: uppercase;
-  }
-  .act-btn:disabled { opacity: 0.28; cursor: not-allowed; }
+  .modal-btns { display: flex; flex-direction: column; gap: 8px; }
+  .btn-cancel { color: var(--text-dim); border-color: #1a1812; margin-top: 4px; }
 
-  .act-btn.shoot-opp {
-    border: 1px solid var(--red-dim);
-    background: var(--red-bg);
-    color: var(--red);
-    flex: 1;
-  }
-  .act-btn.shoot-opp:hover:not(:disabled) {
-    background: rgba(180,30,30,0.22);
-    border-color: var(--red);
-    box-shadow: 0 0 12px rgba(220,80,80,0.2);
-  }
-  .act-btn.shoot-self {
-    border: 1px solid var(--blue-dim);
-    background: var(--blue-bg);
-    color: var(--blue);
-    flex: 1;
-  }
-  .act-btn.shoot-self:hover:not(:disabled) {
-    background: rgba(30,80,180,0.22);
-    border-color: var(--blue);
-    box-shadow: 0 0 12px rgba(80,144,220,0.2);
-  }
-
-  .items-use-grid { display: flex; flex-wrap: wrap; gap: 6px; }
-  .use-chip {
-    display: flex; align-items: center; gap: 5px;
-    padding: 6px 10px;
-    border-radius: 3px;
-    border: 1px solid var(--border2);
-    background: rgba(255,255,255,0.02);
-    cursor: pointer;
-    font-size: 11px;
-    color: var(--dim);
-    transition: all 0.12s;
-    user-select: none;
-    position: relative;
-  }
-  .use-chip:hover:not(.disabled) {
-    border-color: var(--green-dim);
-    color: var(--green);
-    background: rgba(122,184,110,0.06);
-  }
-  .use-chip.disabled { opacity: 0.25; cursor: not-allowed; }
-  .use-chip .use-cnt {
-    font-size: 12px; color: var(--gold);
-    min-width: 12px; text-align: center;
-  }
-  .use-chip.active-item {
-    border-color: var(--orange);
-    background: rgba(224,122,48,0.1);
-    color: var(--orange);
-    box-shadow: 0 0 8px rgba(224,122,48,0.2);
-  }
-  /* Adrenaline steal popup */
-  .steal-popup {
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 0;
-    background: #1a1710;
-    border: 1px solid var(--border2);
-    border-radius: 4px;
-    padding: 6px;
-    z-index: 300;
-    display: flex; gap: 4px; flex-wrap: wrap;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.7);
-    min-width: 160px;
-  }
-  .steal-popup button {
-    padding: 4px 8px;
-    font-size: 10px; letter-spacing: 1px;
-    font-family: inherit;
-    border-radius: 3px;
-    cursor: pointer;
-    text-transform: uppercase;
-    border: 1px solid var(--border2);
-    background: rgba(255,255,255,0.03);
-    color: var(--dim);
-    transition: all 0.1s;
-  }
-  .steal-popup button:hover { border-color: var(--orange); color: var(--orange); }
-
-  /* Dealer turn overlay */
-  .dealer-thinking {
-    text-align: center;
-    padding: 20px;
-    font-size: 12px;
-    letter-spacing: 3px;
-    color: var(--purple);
-    animation: pulse 1s ease-in-out infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
-
-  /* Result overlay for shots */
-  .shot-result {
-    padding: 10px 14px;
-    border-radius: 3px;
-    font-size: 12px; letter-spacing: 2px;
-    margin-bottom: 10px;
+  /* End overlay — NOT fullscreen so log is still visible */
+  #end-overlay {
+    display: none;
+    margin: 16px 0;
     border: 1px solid var(--border);
-    animation: slideIn 0.25s ease-out;
-  }
-  @keyframes slideIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
-  .shot-result.hit   { border-color: var(--red-dim);  background: var(--red-bg);   color: var(--red);   }
-  .shot-result.blank { border-color: #333;            background: rgba(40,40,40,0.3); color: #888; }
-  .shot-result.info  { border-color: var(--gold-dim); background: rgba(200,169,110,0.05); color: var(--gold); }
-  .shot-result.good  { border-color: var(--green-dim);background: rgba(122,184,110,0.06); color: var(--green); }
-
-  /* Round over overlay */
-  .round-over-card {
-    background: rgba(0,0,0,0.7);
-    border: 1px solid var(--gold);
     border-radius: 4px;
-    padding: 28px;
+    padding: 32px 16px;
     text-align: center;
-    margin-bottom: 14px;
-    box-shadow: 0 0 30px rgba(200,169,110,0.15);
+    background: rgba(0,0,0,0.7);
   }
-  .round-over-title {
+  #end-overlay.open { display: block; }
+  .end-emoji { font-size: 48px; margin-bottom: 16px; }
+  .end-title {
     font-family: 'Bebas Neue', monospace;
-    font-size: 36px; letter-spacing: 8px;
+    font-size: 36px;
+    letter-spacing: 8px;
     margin-bottom: 8px;
   }
-  .round-over-sub {
-    font-size: 11px; letter-spacing: 3px;
-    color: var(--dim); margin-bottom: 20px;
+  .end-title.win { color: var(--green); }
+  .end-title.lose { color: var(--red); }
+  .end-subtitle {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    margin-bottom: 24px;
   }
-  .round-over-btn {
-    padding: 12px 28px;
-    font-family: 'Bebas Neue', monospace;
-    font-size: 16px; letter-spacing: 5px;
-    border-radius: 3px;
-    cursor: pointer;
-    border: 1px solid var(--gold-dim);
-    background: rgba(200,169,110,0.1);
-    color: var(--gold);
-    transition: all 0.15s;
-  }
-  .round-over-btn:hover {
-    background: rgba(200,169,110,0.2);
-    border-color: var(--gold);
-    box-shadow: 0 0 18px rgba(200,169,110,0.2);
+  .log-label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    margin: 0 0 6px;
+    text-transform: uppercase;
   }
 
-  /* Items deal display */
-  .items-deal-row {
-    display: flex; gap: 5px; flex-wrap: wrap;
-    margin-top: 6px;
-  }
-  .deal-chip {
-    padding: 3px 8px;
-    font-size: 10px;
-    border-radius: 3px;
-    border: 1px solid var(--green-dim);
-    background: rgba(122,184,110,0.07);
-    color: var(--green);
-  }
-
-  /* Game over */
-  .gameover-title { color: var(--red) !important; }
-  .gameover-btn {
-    border-color: var(--red-dim) !important;
-    background: var(--red-bg) !important;
-    color: var(--red) !important;
-  }
-  .gameover-btn:hover {
-    background: rgba(180,30,30,0.22) !important;
-    border-color: var(--red) !important;
-  }
-  .victory-title { color: var(--green) !important; }
-
-  /* Play log */
-  .play-log-section {
-    border: 1px solid #1a1812;
-    border-radius: 4px;
-    background: rgba(0,0,0,0.45);
-    max-height: 200px;
-    overflow-y: auto;
-    padding: 8px 12px;
-  }
-  .play-log-section::-webkit-scrollbar { width: 4px; }
-  .play-log-section::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
-  /* ═══════════════════════════
-     HISTORY TAB
-  ══════════════════════════ */
-  .hist-game {
-    background: rgba(0,0,0,0.3);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    margin-bottom: 14px;
-    overflow: hidden;
-  }
-  .hist-game-hdr {
-    padding: 10px 14px;
-    background: rgba(0,0,0,0.3);
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.1s;
-  }
-  .hist-game-hdr:hover { background: rgba(200,169,110,0.04); }
-  .hist-game-title {
-    font-family: 'Bebas Neue', monospace;
-    font-size: 16px; letter-spacing: 3px;
-  }
-  .hist-game-title.win  { color: var(--green); }
-  .hist-game-title.loss { color: var(--red); }
-  .hist-game-title.ongoing { color: var(--gold); }
-  .hist-game-meta { font-size: 10px; letter-spacing: 2px; color: var(--dim); }
-  .hist-game-body { padding: 12px 14px; }
-  .hist-round {
-    margin-bottom: 10px;
-    border-left: 2px solid var(--border2);
-    padding-left: 10px;
-  }
-  .hist-round-title {
-    font-size: 10px; letter-spacing: 3px;
-    color: var(--gold-dim); text-transform: uppercase;
-    margin-bottom: 5px;
-  }
-  .hist-move {
-    font-size: 11px; line-height: 1.9;
-    color: var(--dim);
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-    padding-bottom: 2px; margin-bottom: 2px;
-  }
-  .hist-move .who   { color: var(--blue);  }
-  .hist-move .who.d { color: var(--purple); }
-  .hist-move .act   { color: var(--text); }
-  .hist-move .act.shoot { color: var(--red); }
-  .hist-move .act.blank { color: #666; }
-  .hist-move .act.item  { color: var(--green); }
-  .hist-empty { font-size: 12px; letter-spacing: 2px; color: var(--dimmer); text-align: center; padding: 30px; }
+  /* Scrollbar */
+  .log-section::-webkit-scrollbar { width: 4px; }
+  .log-section::-webkit-scrollbar-track { background: transparent; }
+  .log-section::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 </style>
 </head>
 <body>
-<div id="wrap">
 
-  <div class="hdr">
-    <div class="hdr-title">Buckshot Roulette</div>
-    <div class="hdr-sub">ANALYSIS · PLAY · HISTORY</div>
-    <div id="engine-status" style="color:var(--dim)">▸ Loading engine…</div>
+<div id="app">
+  <div class="header">
+    <div class="title">Buckshot Roulette</div>
+    <div class="subtitle">ENGINE ANALYSIS EDITION</div>
+    <div id="turn-indicator"></div>
   </div>
 
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('analyzer')">⚙ Analyzer</button>
-    <button class="tab-btn"        onclick="switchTab('play')">🎲 Play vs Engine</button>
-    <button class="tab-btn"        onclick="switchTab('history')" id="hist-tab-btn">📋 History</button>
+  <!-- Setup screen -->
+  <div id="setup-screen">
+    <p class="setup-desc">
+      Face the dealer in a game of loaded chances.<br>
+      The engine plays optimally. You won't be spared.
+    </p>
+    <button class="btn-begin">BEGIN</button>
   </div>
 
-  <!-- ══════════════════ ANALYZER TAB ══════════════════ -->
-  <div class="tab-pane active" id="tab-analyzer">
+  <!-- Game screen (hidden until game starts) -->
+  <div id="game-screen" style="display:none">
+    <!-- Shells -->
+    <div class="shells-row" id="shells-row"></div>
 
-    <div class="card">
-      <div class="sec-title">Perspective (who is being evaluated)</div>
-      <div class="turn-toggle">
-        <button class="turn-btn active-you"  id="btn-turn-you"    onclick="setTurn('you')">▶ YOUR TURN</button>
-        <button class="turn-btn"             id="btn-turn-dealer" onclick="setTurn('dealer')">DEALER'S TURN ◀</button>
-      </div>
-    </div>
+    <!-- Win odds -->
+    <div class="win-odds"><span id="win-odds-text"></span></div>
 
-    <div class="card">
-      <div class="sec-title">Shells in chamber</div>
-      <div class="shells-editor">
-        <span class="shells-label" style="color:var(--red)">🔴 LIVE</span>
-        <div class="shell-counter">
-          <button class="shell-count-btn" onclick="adjustShell('live',-1)">−</button>
-          <span class="shell-count-val" id="live-val">2</span>
-          <button class="shell-count-btn" onclick="adjustShell('live',+1)">+</button>
-        </div>
-        <span class="shells-label" style="margin-left:12px">⚪ BLANK</span>
-        <div class="shell-counter">
-          <button class="shell-count-btn" onclick="adjustShell('blank',-1)">−</button>
-          <span class="shell-count-val" id="blank-val">2</span>
-          <button class="shell-count-btn" onclick="adjustShell('blank',+1)">+</button>
-        </div>
-      </div>
-      <div class="sec-title" style="margin-bottom:6px">Shell sequence <span style="color:var(--dimmer)">(optional — click pip to toggle, right-click to remove)</span></div>
-      <div class="shell-seq" id="shell-seq"></div>
-      <div class="seq-controls">
-        <button class="seq-btn live-btn"    id="seq-add-live"    onclick="seqAdd('live')">+ Live</button>
-        <button class="seq-btn blank-btn"   id="seq-add-blank"   onclick="seqAdd('blank')">+ Blank</button>
-        <button class="seq-btn unknown-btn" id="seq-add-unknown" onclick="seqAddUnknown()">+ ?</button>
-        <button class="tool-btn"            onclick="seqClear()">Clear Sequence</button>
-      </div>
-    </div>
-
+    <!-- Panels -->
     <div class="panels">
-      <div class="card" id="panel-you">
-        <div class="sec-title">▶ You</div>
-        <div class="lives-counter" id="lives-you-ctr"></div>
-        <div class="items-grid"   id="items-you"></div>
+      <div class="panel" id="panel-player">
+        <div class="panel-title">▶ YOU</div>
+        <div class="lives-row" id="lives-player"></div>
+        <div class="items-grid" id="items-player"></div>
       </div>
-      <div class="card" id="panel-dealer">
-        <div class="sec-title">Dealer ◀</div>
-        <div class="lives-counter" id="lives-dealer-ctr"></div>
-        <div class="items-grid"   id="items-dealer"></div>
-      </div>
-    </div>
-
-    <div class="toolbar">
-      <button class="tool-btn" onclick="resetAll()">↺ Reset All</button>
-      <button class="tool-btn" onclick="presetEarly()">Preset: Early Game</button>
-      <button class="tool-btn" onclick="presetTense()">Preset: Tense End</button>
-    </div>
-
-    <div class="card">
-      <div class="sec-title">Active effects <span style="color:var(--dimmer)">(items currently in use this turn)</span></div>
-      <div class="panels" style="margin-bottom:0">
-        <div>
-          <div class="sec-title" style="margin-bottom:6px">▶ You</div>
-          <div class="active-effects-row" id="active-effects-you"></div>
-        </div>
-        <div>
-          <div class="sec-title" style="margin-bottom:6px">Dealer ◀</div>
-          <div class="active-effects-row" id="active-effects-dealer"></div>
-        </div>
+      <div class="panel" id="panel-dealer">
+        <div class="panel-title">DEALER ◀</div>
+        <div class="lives-row" id="lives-dealer"></div>
+        <div class="items-grid" id="items-dealer"></div>
       </div>
     </div>
 
-    <button class="analyze-btn" id="analyze-btn" onclick="runAnalysis()" disabled>
-      ASK ENGINE
-    </button>
-
-    <div class="card highlight" id="result-card">
-      <div class="sec-title">Engine Recommendation</div>
-      <div class="result-move"     id="result-move"></div>
-      <div class="result-detail"   id="result-detail"></div>
-      <div class="result-prob"     id="result-prob"></div>
-      <div class="prob-bar-wrap"><div class="prob-bar" id="prob-bar"></div></div>
+    <!-- Action area -->
+    <div class="action-area" id="action-area">
+      <div class="action-title">Actions</div>
+      <div class="btn-grid" id="btn-grid"></div>
+      <div class="warnings" id="warnings"></div>
     </div>
 
-    <div class="sec-title" style="margin-bottom:6px">Analysis Log</div>
-    <div class="log-section" id="log"></div>
+    <!-- End overlay (inline, so log is still accessible) -->
+    <div id="end-overlay">
+      <div class="end-emoji" id="end-emoji"></div>
+      <div class="end-title" id="end-title"></div>
+      <div class="end-subtitle" id="end-subtitle"></div>
+      <button class="btn-begin" style="margin-bottom:24px">PLAY AGAIN</button>
+      <div class="log-label">Game Log</div>
+    </div>
+
+    <!-- Log always visible -->
+    <div class="log-section" id="game-log"></div>
   </div>
-
-  <!-- ══════════════════ PLAY TAB ══════════════════ -->
-  <div class="tab-pane" id="tab-play">
-
-    <!-- Start screen -->
-    <div id="play-start" class="round-over-card" style="margin-top:20px">
-      <div class="round-over-title" style="color:var(--gold); font-family:'Bebas Neue',monospace; font-size:32px; letter-spacing:8px">PLAY VS ENGINE</div>
-      <div class="round-over-sub">3 ROUNDS · 4 LIVES EACH · ENGINE PLAYS DEALER</div>
-      <div style="font-size:10px; letter-spacing:2px; color:var(--dimmer); margin-bottom:20px">Items increase with each chamber reload. Round ends when someone loses all lives.</div>
-      <button class="round-over-btn" onclick="startGame()">▶ BEGIN GAME</button>
-    </div>
-
-    <!-- Active game -->
-    <div id="play-game" style="display:none">
-
-      <!-- Round / lives header -->
-      <div class="play-hdr">
-        <div class="play-hdr-block">
-          <div class="play-hdr-label">Round</div>
-          <div class="play-hdr-val gold" id="ph-round">1 / 3</div>
-        </div>
-        <div class="play-hdr-block">
-          <div class="play-hdr-label">Your lives</div>
-          <div class="hearts-row" id="ph-you-hearts"></div>
-        </div>
-        <div class="play-hdr-block">
-          <div class="play-hdr-label">Dealer lives</div>
-          <div class="hearts-row" id="ph-dealer-hearts"></div>
-        </div>
-        <div class="play-hdr-block">
-          <div class="play-hdr-label">Chamber load</div>
-          <div class="play-hdr-val blue" id="ph-load-num">1</div>
-        </div>
-      </div>
-
-      <!-- Chamber -->
-      <div class="chamber-wrap">
-        <div class="sec-title">Chamber <span id="ch-counts" style="color:var(--dimmer)"></span></div>
-        <div class="chamber-shells" id="ch-shells"></div>
-        <div id="ch-info" style="font-size:10px; letter-spacing:2px; color:var(--dim); margin-top:4px"></div>
-      </div>
-
-      <!-- Your items -->
-      <div class="card" id="play-items-card">
-        <div class="sec-title">Your Items</div>
-        <div class="items-use-grid" id="play-items-grid"></div>
-      </div>
-
-      <!-- Dealer items -->
-      <div class="card">
-        <div class="sec-title">Dealer Items <span style="color:var(--dimmer); font-size:10px">(visible)</span></div>
-        <div class="items-use-grid" id="play-dealer-items-grid"></div>
-      </div>
-
-      <!-- Action area -->
-      <div class="action-area" id="play-action-area">
-        <div class="sec-title" id="play-whose-turn">Your Turn</div>
-        <div id="play-shot-result"></div>
-        <div class="action-btns" id="play-shoot-btns">
-          <button class="act-btn shoot-opp"  id="btn-shoot-dealer" onclick="playerShoot('opp')">🔫 Shoot Dealer</button>
-          <button class="act-btn shoot-self" id="btn-shoot-self"   onclick="playerShoot('self')">🔫 Shoot Self</button>
-        </div>
-        <div id="dealer-thinking-area"></div>
-      </div>
-
-      <!-- Play log -->
-      <div class="sec-title" style="margin-bottom:6px">Turn Log</div>
-      <div class="play-log-section" id="play-log"></div>
-    </div>
-
-    <!-- Round over -->
-    <div id="play-round-over" style="display:none"></div>
-
-  </div>
-
-  <!-- ══════════════════ HISTORY TAB ══════════════════ -->
-  <div class="tab-pane" id="tab-history">
-    <div style="padding-top:14px" id="hist-content">
-      <div class="hist-empty">— No games played yet —</div>
-    </div>
-  </div>
-
 </div>
 
-<div id="status-bar">BUCKSHOT — SET POSITION, THEN ASK ENGINE</div>
+<!-- Steal modal -->
+<div id="steal-modal">
+  <div class="modal-box">
+    <div class="modal-title">STEAL ITEM</div>
+    <div class="modal-desc">Choose which item to steal from dealer:</div>
+    <div class="modal-btns" id="steal-btns"></div>
+  </div>
+</div>
+
+<div id="status-bar"></div>
 
 <script>
-// ════════════════════════════════════════
-// SHARED STATE + ANALYZER (original code)
-// ════════════════════════════════════════
 
-const ITEM_META = {
-  saw:        { icon: "🪚", label: "Handsaw",      desc: "Next shot ×2 dmg" },
-  beer:       { icon: "🍺", label: "Beer",         desc: "Eject shell" },
-  cig:        { icon: "🚬", label: "Cigarette",    desc: "+1 life" },
-  inverter:   { icon: "🔀", label: "Inverter",     desc: "Flip shell type" },
-  jammer:     { icon: "📡", label: "Jammer",       desc: "Keep turn on hit" },
-  adrenaline: { icon: "💉", label: "Adrenaline",   desc: "Steal item" },
-  spyglass:   { icon: "🔭", label: "Spyglass",     desc: "Peek next shell" },
-  phone:      { icon: "📱", label: "Burner Phone", desc: "Peek any shell" },
-};
-const ITEM_KEYS = Object.keys(ITEM_META);
+    // ─── STATE ───────────────────────────────────────────────────────────────────
 
-function newItems(lives = 3) {
-  return { lives, saw:0, beer:0, cig:0, inverter:0, jammer:0, adrenaline:0, spyglass:0, phone:0 };
-}
+    let gs = null;
+    let playerTurn = true;
+    let phase = "setup"; // setup | playing | win | lose
+    let thinking = false;
+    let winChance = 50;
+    let gameLog = [];
 
-let st = { dshell:2, bshell:2, you: newItems(3), dealer: newItems(3) };
-let shellSequence = [];
-let openPopupIdx  = null;
-let turnPerspective = "you";
-let engineReady   = false;
-let platform      = null;
-let analyzing     = false;
-let logEntries    = [];
-let activeEffects = {
-  you:    { jammer_using:0, saw_using:false, inverter_using:false },
-  dealer: { jammer_using:0, saw_using:false, inverter_using:false },
-};
+    const STEALABLE = ["saw", "inverter", "beer", "jammer", "cig", "spyglass", "phone"];
 
-// ── Tab switch ─────────────────────────────────────────────────────────────
-let currentTab = 'analyzer';
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  const btns = document.querySelectorAll('.tab-btn');
-  const names = ['analyzer','play','history'];
-  btns[names.indexOf(tab)].classList.add('active');
-  if (tab === 'history') renderHistory();
-}
+    const ITEM_META = {
+      saw:        { label: "Handsaw",    icon: "🪚", desc: "Next shot deals 2 damage" },
+      beer:       { label: "Beer",       icon: "🍺", desc: "Eject current shell" },
+      cig:        { label: "Cigarette",  icon: "🚬", desc: "Heal 1 life" },
+      inverter:   { label: "Inverter",   icon: "🔀", desc: "Invert next shell" },
+      jammer:     { label: "Jammer",     icon: "📡", desc: "Keep turn after shooting opp" },
+      adrenaline: { label: "Adrenaline", icon: "💉", desc: "Steal opponent item" },
+      spyglass:   { label: "Spyglass",   icon: "🔭", desc: "Reveal current chamber shell" },
+      phone:      { label: "Burner Phone", icon: "📱", desc: "Reveal any shell position (3+ shells required)" },
+    };
 
-// ── Log (analyzer) ─────────────────────────────────────────────────────────
-function addLog(msg, type = "neutral") {
-  logEntries = [...logEntries.slice(-80), { msg, type }];
-  renderLog();
-}
-function renderLog() {
-  const el = document.getElementById("log");
-  if (!el) return;
-  if (logEntries.length === 0) { el.innerHTML = '<div class="log-empty">— awaiting analysis —</div>'; return; }
-  el.innerHTML = logEntries.map(e => `<div class="log-entry ${e.type}">${esc(e.msg)}</div>`).join("");
-  el.scrollTop = el.scrollHeight;
-}
-function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+    // Shell sequence: actual ordered chamber. Index 0 = next to fire.
+    let shellSequence = [];
 
-// ── Shell adjustments ──────────────────────────────────────────────────────
-function adjustShell(type, delta) {
-  if (type === "live") st.dshell = Math.max(0, Math.min(8, st.dshell + delta));
-  else                 st.bshell = Math.max(0, Math.min(8, st.bshell + delta));
-  syncSequenceToCount();
-  renderAll();
-}
-function syncSequenceToCount() {
-  const total = st.dshell + st.bshell;
-  if (shellSequence.length > total) shellSequence = shellSequence.slice(0, total);
-  let lp=0, bp=0;
-  shellSequence = shellSequence.map(v => {
-    if (v==="live")  { if(lp<st.dshell){lp++;return"live";}return"unknown"; }
-    if (v==="blank") { if(bp<st.bshell){bp++;return"blank";}return"unknown"; }
-    return v;
-  });
-}
+    function cloneItems(it) { return { ...it }; }
+    function cloneState(s) { return { dshell: s.dshell, bshell: s.bshell, my_items: cloneItems(s.my_items), opp_items: cloneItems(s.opp_items) }; }
 
-function seqAdd(type) {
-  const total = st.dshell + st.bshell;
-  if (shellSequence.length >= total) return;
-  const cur = shellSequence.filter(x=>x===type).length;
-  const cap = type==="live" ? st.dshell : st.bshell;
-  if (cur >= cap) { addLog(`No more ${type} shells (declared count is ${cap})`,"neutral"); return; }
-  shellSequence.push(type);
-  openPopupIdx = null;
-  renderAll();
-}
-function seqAddUnknown() {
-  if (shellSequence.length >= st.dshell+st.bshell) return;
-  shellSequence.push("unknown");
-  openPopupIdx = null;
-  renderAll();
-}
-function seqPipClick(idx, event) { event.stopPropagation(); openPopupIdx=null; seqToggle(idx); }
-function seqRemove(idx) { shellSequence.splice(idx,1); renderAll(); }
-function seqToggle(idx) {
-  const cur=shellSequence[idx];
-  if(cur==="unknown")return;
-  const next=cur==="live"?"blank":"live";
-  const cap=next==="live"?st.dshell:st.bshell;
-  if(shellSequence.filter(x=>x===next).length>=cap){addLog(`Cannot toggle: already at max ${next} count`,"neutral");return;}
-  shellSequence[idx]=next; renderAll();
-}
-function seqUnknownClick(idx,event){event.stopPropagation();openPopupIdx=openPopupIdx===idx?null:idx;renderSeq();}
-function seqSetFromPopup(idx,type){
-  if(type==="unknown"){shellSequence[idx]="unknown";}
-  else{const cur=shellSequence.filter(x=>x===type).length;const cap=type==="live"?st.dshell:st.bshell;if(cur>=cap){addLog(`Cannot set: already at max ${type}`,"neutral");openPopupIdx=null;renderSeq();return;}shellSequence[idx]=type;}
-  openPopupIdx=null;renderAll();
-}
-function seqClear(){shellSequence=[];openPopupIdx=null;renderAll();}
-document.addEventListener("click",()=>{if(openPopupIdx!==null){openPopupIdx=null;renderSeq();}});
+    // ─── LOGGING ─────────────────────────────────────────────────────────────────
 
-function toggleEffect(who,key){
-  if(key==="jammer_using") activeEffects[who].jammer_using=activeEffects[who].jammer_using?0:1;
-  else activeEffects[who][key]=!activeEffects[who][key];
-  renderActiveEffects();
-}
-function renderActiveEffects(){
-  const defs=[
-    {key:"saw_using",icon:"🪚",label:"SAW",color:"var(--orange)"},
-    {key:"jammer_using",icon:"📡",label:"JAMMER",color:"var(--purple)"},
-    {key:"inverter_using",icon:"🔀",label:"INVERTER",color:"var(--blue)"},
-  ];
-  for(const who of["you","dealer"]){
-    const c=document.getElementById(`active-effects-${who}`);
-    if(!c)continue;
-    c.innerHTML=defs.map(d=>{
-      const active=!!activeEffects[who][d.key];
-      return`<div class="effect-toggle${active?" effect-on":""}" onclick="toggleEffect('${who}','${d.key}')" style="${active?`--eff-color:${d.color}`:""}">
-        <span class="effect-icon">${d.icon}</span>
-        <span class="effect-label">${d.label}</span>
-        <span class="effect-dot">${active?"●":"○"}</span>
-      </div>`;
-    }).join("");
-  }
-}
-
-function setTurn(t){
-  turnPerspective=t;
-  document.getElementById("btn-turn-you").className   ="turn-btn"+(t==="you"   ?" active-you":"");
-  document.getElementById("btn-turn-dealer").className="turn-btn"+(t==="dealer"?" active-dealer":"");
-}
-
-function adjustItem(who,key,delta){ st[who][key]=Math.max(0,Math.min(3,(st[who][key]||0)+delta)); renderAll(); }
-function adjustLives(who,delta){ st[who].lives=Math.max(1,Math.min(4,st[who].lives+delta)); renderAll(); }
-
-function resetAll(){
-  st={dshell:2,bshell:2,you:newItems(3),dealer:newItems(3)};
-  shellSequence=[];openPopupIdx=null;
-  activeEffects={you:{jammer_using:0,saw_using:false,inverter_using:false},dealer:{jammer_using:0,saw_using:false,inverter_using:false}};
-  renderAll();
-  document.getElementById("result-card").classList.remove("visible");
-  addLog("Position reset","neutral");
-}
-function presetEarly(){
-  st={dshell:3,bshell:3,you:{...newItems(4),beer:1,cig:1,saw:1},dealer:{...newItems(4),beer:1,inverter:1}};
-  shellSequence=[];openPopupIdx=null;renderAll();
-  document.getElementById("result-card").classList.remove("visible");
-  addLog("Preset loaded: Early Game","info");
-}
-function presetTense(){
-  st={dshell:2,bshell:1,you:{...newItems(1),spyglass:1},dealer:{...newItems(2),saw:1,jammer:1}};
-  shellSequence=[];openPopupIdx=null;renderAll();
-  document.getElementById("result-card").classList.remove("visible");
-  addLog("Preset loaded: Tense End","info");
-}
-
-function renderAll(){
-  document.getElementById("live-val").textContent =st.dshell;
-  document.getElementById("blank-val").textContent=st.bshell;
-  renderSeq();
-  renderPanel("you");
-  renderPanel("dealer");
-  renderActiveEffects();
-  updateAnalyzeBtn();
-  renderStatusBar();
-}
-function renderSeq(){
-  const total=st.dshell+st.bshell;
-  const seq=document.getElementById("shell-seq");
-  if(!seq)return;
-  let html="";
-  for(let i=0;i<shellSequence.length;i++){
-    const t=shellSequence[i];
-    if(t==="unknown"){
-      const popOpen=openPopupIdx===i;
-      html+=`<div class="shell-pip unknown" title="Click to assign" onclick="seqUnknownClick(${i},event)" oncontextmenu="event.preventDefault();seqRemove(${i})" style="position:relative">?${popOpen?`<div class="shell-popup" onclick="event.stopPropagation()"><button class="pop-live" onclick="seqSetFromPopup(${i},'live')">◆ Live</button><button class="pop-blank" onclick="seqSetFromPopup(${i},'blank')">○ Blank</button></div>`:""}</div>`;
-    } else {
-      html+=`<div class="shell-pip ${t}" title="Click to toggle, right-click to remove" onclick="seqPipClick(${i},event)" oncontextmenu="event.preventDefault();seqRemove(${i})">${t==="live"?"◆":"○"}</div>`;
+    function addLog(msg, type = "neutral") {
+      gameLog = [...gameLog.slice(-60), { msg, type }];
+      renderLog();
     }
-  }
-  const remaining=total-shellSequence.length;
-  for(let i=0;i<remaining;i++) html+=`<div class="shell-pip unknown" style="opacity:0.35;cursor:default">?</div>`;
-  if(total===0){html=`<span class="seq-hint">Set shell counts above</span>`;}
-  else{
-    const kc=shellSequence.filter(x=>x!=="unknown").length;
-    const af=shellSequence.length===total;
-    if(af&&kc===total) html+=`<span class="seq-hint" style="color:var(--green-dim);margin-left:4px">✓ Full sequence known</span>`;
-    else if(shellSequence.length>0) html+=`<span class="seq-hint" style="margin-left:4px">${kc}/${total} known · ${shellSequence.length}/${total} placed</span>`;
-    else html+=`<span class="seq-hint" style="margin-left:4px">0/${total} placed</span>`;
-  }
-  seq.innerHTML=html;
-  const liveFull=shellSequence.filter(x=>x==="live").length>=st.dshell||shellSequence.length>=total;
-  const blankFull=shellSequence.filter(x=>x==="blank").length>=st.bshell||shellSequence.length>=total;
-  const unknownFull=shellSequence.length>=total;
-  const sla=document.getElementById("seq-add-live");if(sla)sla.disabled=liveFull;
-  const sba=document.getElementById("seq-add-blank");if(sba)sba.disabled=blankFull;
-  const sua=document.getElementById("seq-add-unknown");if(sua)sua.disabled=unknownFull;
-}
-function renderPanel(who){
-  const items=st[who];
-  const lctr=document.getElementById(`lives-${who}-ctr`);
-  if(!lctr)return;
-  lctr.innerHTML=`<button class="shell-count-btn" onclick="adjustLives('${who}',-1)">−</button><span style="font-size:14px;margin:0 4px">`+
-    Array.from({length:4},(_,i)=>`<span class="heart ${i<items.lives?'alive':'dead'}" onclick="adjustLives('${who}',${i+1-items.lives})">${i<items.lives?"♥":"♡"}</span>`).join("")+
-    `</span><button class="shell-count-btn" onclick="adjustLives('${who}',+1)">+</button>`;
-  const igrid=document.getElementById(`items-${who}`);
-  if(!igrid)return;
-  let html="";
-  for(const[key,meta]of Object.entries(ITEM_META)){
-    const count=items[key]||0;
-    html+=`<div class="item-chip" onclick="adjustItem('${who}','${key}',+1)" title="${meta.desc}">
-      <span>${meta.icon}</span>
-      <span style="font-size:10px;color:var(--dim)">${meta.label}</span>
-      <span class="cnt">${count}</span>
-      ${count>0?`<span class="minus" onclick="event.stopPropagation();adjustItem('${who}','${key}',-1)">−</span>`:""}
-    </div>`;
-  }
-  igrid.innerHTML=html;
-}
-function updateAnalyzeBtn(){
-  const total=st.dshell+st.bshell;
-  const ok=engineReady&&total>0&&!analyzing;
-  const b=document.getElementById("analyze-btn");if(b)b.disabled=!ok;
-}
-function renderStatusBar(){
-  const total=st.dshell+st.bshell;
-  document.getElementById("status-bar").textContent=
-    `${st.dshell}L / ${st.bshell}B · YOU ${st.you.lives}♥ · DEALER ${st.dealer.lives}♥ · ${turnPerspective.toUpperCase()}'S TURN`;
-}
 
-// ── Engine wiring ──────────────────────────────────────────────────────────
-function loadPerson(person, items){
-  platform.post(`engine s ${person} lives ${items.lives}`);
-  platform.post(`engine s ${person} adrenaline ${items.adrenaline}`);
-  platform.post(`engine s ${person} beer ${items.beer}`);
-  platform.post(`engine s ${person} cig ${items.cig}`);
-  platform.post(`engine s ${person} inverter ${items.inverter}`);
-  platform.post(`engine s ${person} jammer ${items.jammer}`);
-  platform.post(`engine s ${person} phone ${items.phone}`);
-  platform.post(`engine s ${person} saw ${items.saw}`);
-  platform.post(`engine s ${person} spyglass ${items.spyglass}`);
-}
-function loadEngine(dshell, bshell, myItems, oppItems){
-  platform.post("engine init");
-  platform.post(`engine s dshell ${dshell}`);
-  platform.post(`engine s bshell ${bshell}`);
-  loadPerson("my",  myItems);
-  loadPerson("opp", oppItems);
-}
-
-// ── Analysis ───────────────────────────────────────────────────────────────
-function runAnalysis(){
-  if(!engineReady||analyzing)return;
-  const total=st.dshell+st.bshell;
-  if(total===0){addLog("No shells in chamber","neutral");return;}
-  analyzing=true;
-  document.getElementById("analyze-btn").disabled=true;
-  document.getElementById("analyze-btn").textContent="CALCULATING…";
-  addLog(`Analyzing — ${st.dshell}L / ${st.bshell}B · ${turnPerspective==="you"?"Your":"Dealer's"} turn`,"info");
-  const myItems =turnPerspective==="you"?{...st.you}  :{...st.dealer};
-  const oppItems=turnPerspective==="you"?{...st.dealer}:{...st.you};
-  platform.post("engine init");
-  loadEngine(st.dshell,st.bshell,myItems,oppItems);
-  const myFx =turnPerspective==="you"?activeEffects.you   :activeEffects.dealer;
-  const oppFx=turnPerspective==="you"?activeEffects.dealer:activeEffects.you;
-  platform.post(`engine s my ju ${myFx.jammer_using}`);
-  platform.post(`engine s my su ${myFx.saw_using}`);
-  platform.post(`engine s my iu ${myFx.inverter_using}`);
-  platform.post(`engine s opp ju ${oppFx.jammer_using}`);
-  platform.post(`engine s opp su ${oppFx.saw_using}`);
-  platform.post(`engine s opp iu ${oppFx.inverter_using}`);
-  const phoneVec=Array.from({length:total},(_,i)=>{const s=shellSequence[i];if(s==="live")return 1;if(s==="blank")return 2;return 0;});
-  platform.set_phone_vec(phoneVec,"me");
-  if(phoneVec.some(v=>v!==0)) addLog(`Phone vec: [${phoneVec.join(", ")}]`,"engine");
-  const fx=[];
-  if(myFx.saw_using)      fx.push(`🪚 Saw (${turnPerspective==="you"?"You":"Dealer"})`);
-  if(myFx.jammer_using)   fx.push(`📡 Jammer (${turnPerspective==="you"?"You":"Dealer"})`);
-  if(myFx.inverter_using) fx.push(`🔀 Inverter (${turnPerspective==="you"?"You":"Dealer"})`);
-  if(oppFx.saw_using)      fx.push(`🪚 Saw (${turnPerspective==="you"?"Dealer":"You"})`);
-  if(oppFx.jammer_using)   fx.push(`📡 Jammer (${turnPerspective==="you"?"Dealer":"You"})`);
-  if(oppFx.inverter_using) fx.push(`🔀 Inverter (${turnPerspective==="you"?"Dealer":"You"})`);
-  if(fx.length) addLog(`Active effects: ${fx.join(" · ")}`,"engine");
-  const reply=platform.post("engine go").split(" ");
-  const move=reply[0];const winPct=Number(reply[1]);
-  addLog(`Engine output: "${move}" · win ${winPct}%`,"engine");
-  showResult(move,winPct);
-  analyzing=false;
-  document.getElementById("analyze-btn").disabled=false;
-  document.getElementById("analyze-btn").textContent="ASK ENGINE";
-}
-
-const MOVE_LABELS={
-  shootopp:    {label:"SHOOT DEALER",  cls:"shoot",explain:"The engine recommends shooting the dealer this turn."},
-  shootself:   {label:"SHOOT YOURSELF",cls:"self", explain:"A blank is likely in the chamber — shoot yourself to keep your turn."},
-  usebeer:     {label:"USE BEER",      cls:"item", explain:"Eject the current shell before committing to a shot."},
-  usecig:      {label:"USE CIGARETTE", cls:"item", explain:"Heal 1 life before taking action."},
-  usesaw:      {label:"USE HANDSAW",   cls:"item", explain:"Activate the saw to deal 2× damage on the next shot."},
-  usejammer:   {label:"USE JAMMER",    cls:"item", explain:"Activate jammer — keep turn even after hitting the dealer."},
-  useinverter: {label:"USE INVERTER",  cls:"item", explain:"Flip the current shell type before shooting."},
-  usespyglass: {label:"USE SPYGLASS",  cls:"item", explain:"Peek the current chamber shell before deciding."},
-  usephone:    {label:"USE BURNER PHONE",cls:"item",explain:"Gather information about a shell further down the chamber."},
-};
-function showResult(move,winPct){
-  const mv=move.toLowerCase().replace(/^use(adrenaline.*)/,"useadrenaline");
-  const meta=MOVE_LABELS[mv]||{label:move.toUpperCase(),cls:"item",explain:""};
-  const card=document.getElementById("result-card");
-  const mEl=document.getElementById("result-move");
-  const dEl=document.getElementById("result-detail");
-  const pEl=document.getElementById("result-prob");
-  const bar=document.getElementById("prob-bar");
-  mEl.textContent=meta.label;mEl.className="result-move "+meta.cls;
-  let detail=meta.explain;
-  if(mv.startsWith("useadrenaline")){const tool=mv.replace("useadrenaline","").replace("_","");const tm=ITEM_META[tool];detail=tm?`Steal ${tm.icon} ${tm.label} from the opponent.`:"Steal an item via Adrenaline.";}
-  dEl.textContent=detail;
-  const col=winPct>=60?"var(--green)":winPct<=40?"var(--red)":"var(--gold)";
-  pEl.innerHTML=`Win probability after best play: <span style="color:${col};font-size:15px">${winPct}%</span>`;
-  bar.style.width=winPct+"%";bar.style.background=col;
-  card.classList.add("visible");
-  card.scrollIntoView({behavior:"smooth",block:"nearest"});
-}
-
-// ════════════════════════════════════════
-// PLAY MODE
-// ════════════════════════════════════════
-
-// Game state
-let gm = null; // game state object
-
-function startGame() {
-  document.getElementById('play-start').style.display = 'none';
-  document.getElementById('play-game').style.display  = 'block';
-  document.getElementById('play-round-over').style.display = 'none';
-  gm = {
-    round: 1,         // 1-3
-    maxRounds: 3,
-    playerLives: 4,
-    dealerLives: 4,
-    maxLives: 4,
-    loadNum: 1,       // chamber load number this round (resets each round)
-    // Shell state for current load
-    shells: [],       // array of "live"|"blank"
-    shellIdx: 0,      // next shell to fire
-    dshell: 0,
-    bshell: 0,
-    // Item inventories
-    playerItems: newItems(4),
-    dealerItems:  newItems(4),
-    // Active effects this turn
-    playerFx: { saw: false, jammer: false, inverter: false },
-    dealerFx:  { saw: false, jammer: false, inverter: false },
-    // Derived/temp
-    isPlayerTurn: true,
-    gameOver: false,
-    roundOver: false,
-    spyglassRevealed: null, // null | "live" | "blank"
-    phoneRevealed: null,    // null | { idx, type }
-    stealMenuOpen: false,
-    // History tracking
-    history: [], // array of rounds, each with moves
-    currentRoundMoves: [],
-  };
-  // Begin game history record
-  gameHistoryRecords.push({
-    id: gameHistoryRecords.length + 1,
-    startTime: new Date().toLocaleTimeString(),
-    rounds: [],
-    outcome: 'ongoing',
-  });
-  dealNewLoad();
-}
-
-// Items given per load number (cumulative to that load in the round)
-// loadNum 1 → 1-2 items each, loadNum 2 → 2-3, loadNum 3+ → 3-4
-function itemsForLoad(loadNum) {
-  // Returns count of items to GIVE (not total)
-  if (loadNum === 1) return randInt(1, 2);
-  if (loadNum === 2) return randInt(2, 3);
-  return randInt(3, 4);
-}
-
-function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-function randItem() { return ITEM_KEYS[Math.floor(Math.random() * ITEM_KEYS.length)]; }
-
-function giveItems(inv, count) {
-  const given = [];
-  for (let i = 0; i < count; i++) {
-    const key = randItem();
-    inv[key] = Math.min(3, (inv[key] || 0) + 1);
-    given.push(key);
-  }
-  return given;
-}
-
-// Generate shells for a load. loadNum → more total shells
-function genShells(loadNum, round) {
-  const base = 2 + loadNum; // 3, 4, 5 for loads 1,2,3
-  const total = Math.min(8, base + Math.floor(Math.random() * 2));
-  const live = Math.max(1, Math.floor(total / 2) + (Math.random() > 0.5 ? 1 : 0));
-  const blank = total - live;
-  const arr = [...Array(live).fill('live'), ...Array(blank).fill('blank')];
-  // Shuffle
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return { shells: arr, live, blank };
-}
-
-function dealNewLoad() {
-  if (!gm) return;
-  // Reset active effects
-  gm.playerFx = { saw: false, jammer: false, inverter: false };
-  gm.dealerFx  = { saw: false, jammer: false, inverter: false };
-  gm.spyglassRevealed = null;
-  gm.phoneRevealed    = null;
-
-  const { shells, live, blank } = genShells(gm.loadNum, gm.round);
-  gm.shells   = shells;
-  gm.shellIdx = 0;
-  gm.dshell   = live;
-  gm.bshell   = blank;
-
-  // Give items
-  const playerCount = itemsForLoad(gm.loadNum);
-  const dealerCount = itemsForLoad(gm.loadNum);
-  const playerGiven = giveItems(gm.playerItems, playerCount);
-  const dealerGiven = giveItems(gm.dealerItems, dealerCount);
-
-  // Log
-  playLog(`── Chamber ${gm.loadNum} loaded: ${live} live, ${blank} blank ──`, 'info');
-  if (playerGiven.length) playLog(`You received: ${playerGiven.map(k=>ITEM_META[k].icon+' '+ITEM_META[k].label).join(', ')}`, 'good');
-  if (dealerGiven.length) playLog(`Dealer received: ${dealerGiven.map(k=>ITEM_META[k].icon+' '+ITEM_META[k].label).join(', ')}`, 'neutral');
-
-  // History
-  const cur = currentHistGame();
-  if (cur) {
-    gm.currentRoundMoves = [];
-    const roundIdx = gm.round - 1;
-    if (!cur.rounds[roundIdx]) cur.rounds[roundIdx] = { round: gm.round, loads: [] };
-    cur.rounds[roundIdx].loads.push({ loadNum: gm.loadNum, live, blank, moves: gm.currentRoundMoves });
-  }
-
-  renderPlay();
-  // If dealer's turn to start, run dealer immediately
-  if (!gm.isPlayerTurn) setTimeout(runDealerTurn, 600);
-}
-
-function currentHistGame() {
-  return gameHistoryRecords[gameHistoryRecords.length - 1] || null;
-}
-
-// ── Play log ───────────────────────────────────────────────────────────────
-let playLogEntries = [];
-function playLog(msg, type = 'neutral') {
-  playLogEntries = [...playLogEntries.slice(-120), { msg, type }];
-  const el = document.getElementById('play-log');
-  if (!el) return;
-  el.innerHTML = playLogEntries.map(e => `<div class="log-entry ${e.type}">${esc(e.msg)}</div>`).join('');
-  el.scrollTop = el.scrollHeight;
-}
-
-// ── Render play UI ─────────────────────────────────────────────────────────
-function renderPlay() {
-  if (!gm) return;
-
-  // Header
-  document.getElementById('ph-round').textContent = `${gm.round} / ${gm.maxRounds}`;
-  renderHearts('ph-you-hearts',    gm.playerLives, gm.maxLives);
-  renderHearts('ph-dealer-hearts', gm.dealerLives, gm.maxLives);
-  document.getElementById('ph-load-num').textContent = gm.loadNum;
-
-  // Chamber
-  const remaining = gm.shells.length - gm.shellIdx;
-  document.getElementById('ch-counts').textContent =
-    `${gm.shells.slice(gm.shellIdx).filter(x=>x==='live').length}L / ${gm.shells.slice(gm.shellIdx).filter(x=>x==='blank').length}B remaining`;
-
-  const chEl = document.getElementById('ch-shells');
-  let html = '';
-  for (let i = 0; i < gm.shells.length; i++) {
-    const fired = i < gm.shellIdx;
-    const isNext = i === gm.shellIdx;
-    let cls = 'hidden';
-    let label = '?';
-    // Reveal if spyglass/phone peeked this slot
-    if (gm.spyglassRevealed && isNext) { cls = gm.spyglassRevealed; label = cls === 'live' ? '◆' : '○'; }
-    else if (gm.phoneRevealed && gm.phoneRevealed.idx === i) { cls = gm.phoneRevealed.type; label = cls === 'live' ? '◆' : '○'; }
-
-    if (fired) cls += ' fired';
-    if (isNext && !fired) cls += ' next-shell';
-    html += `<div class="ch-pip ${cls}">${fired ? (gm.shells[i]==='live'?'◆':'○') : label}</div>`;
-  }
-  chEl.innerHTML = html;
-
-  // Info
-  const infoEl = document.getElementById('ch-info');
-  const effects = [];
-  if (gm.playerFx.saw)     effects.push('🪚 Saw active (×2 dmg)');
-  if (gm.playerFx.inverter)effects.push('🔀 Inverter active');
-  if (gm.playerFx.jammer)  effects.push('📡 Jammer active');
-  if (gm.dealerFx.saw)     effects.push('🪚 Dealer Saw');
-  if (gm.dealerFx.inverter)effects.push('🔀 Dealer Inverter');
-  if (gm.dealerFx.jammer)  effects.push('📡 Dealer Jammer');
-  infoEl.textContent = effects.join(' · ');
-
-  // Items
-  renderPlayItems('play-items-grid',        gm.playerItems, true);
-  renderPlayItems('play-dealer-items-grid', gm.dealerItems, false);
-
-  // Whose turn
-  const turnEl   = document.getElementById('play-whose-turn');
-  const shootBtns= document.getElementById('play-shoot-btns');
-  const actArea  = document.getElementById('play-action-area');
-
-  if (gm.isPlayerTurn) {
-    turnEl.textContent = '▶ Your Turn';
-    turnEl.style.color = 'var(--gold)';
-    shootBtns.style.display = 'flex';
-    document.getElementById('btn-shoot-dealer').disabled = false;
-    document.getElementById('btn-shoot-self').disabled   = false;
-  } else {
-    turnEl.textContent = '◀ Dealer\'s Turn';
-    turnEl.style.color = 'var(--purple)';
-    shootBtns.style.display = 'none';
-  }
-
-  // Status bar
-  document.getElementById('status-bar').textContent =
-    `R${gm.round} · Load ${gm.loadNum} · YOU ${gm.playerLives}♥ · DEALER ${gm.dealerLives}♥ · ${gm.isPlayerTurn?'YOUR TURN':'DEALER THINKING…'}`;
-}
-
-function renderHearts(id, cur, max) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.innerHTML = Array.from({ length: max }, (_, i) =>
-    `<span class="ph ${i < cur ? 'alive' : 'dead'}">${i < cur ? '♥' : '♡'}</span>`
-  ).join('');
-}
-
-function renderPlayItems(gridId, items, isPlayer) {
-  const el = document.getElementById(gridId);
-  if (!el) return;
-  let html = '';
-  for (const [key, meta] of Object.entries(ITEM_META)) {
-    const count = items[key] || 0;
-    if (!isPlayer && count === 0) continue; // hide zero dealer items
-    const disabled = !isPlayer || count === 0 || !gm.isPlayerTurn || gm.gameOver;
-    if (key === 'adrenaline' && isPlayer && count > 0) {
-      // Render with steal popup
-      html += `<div class="use-chip${disabled?' disabled':''}" style="position:relative" id="chip-adrenaline" onclick="${disabled?'':'toggleStealMenu()'}">
-        <span>${meta.icon}</span>
-        <span>${meta.label}</span>
-        <span class="use-cnt">${count}</span>
-      </div>`;
-    } else {
-      html += `<div class="use-chip${disabled?' disabled':''}" onclick="${disabled?'void 0':`useItem('${key}')`}">
-        <span>${meta.icon}</span>
-        <span>${meta.label}</span>
-        <span class="use-cnt">${count > 0 ? count : ''}</span>
-      </div>`;
-    }
-  }
-  el.innerHTML = html;
-}
-
-let stealMenuOpenState = false;
-function toggleStealMenu() {
-  stealMenuOpenState = !stealMenuOpenState;
-  const chip = document.getElementById('chip-adrenaline');
-  if (!chip) return;
-  const existing = chip.querySelector('.steal-popup');
-  if (existing) { existing.remove(); stealMenuOpenState = false; return; }
-  // Build steal menu from dealer items that have count > 0
-  const stealable = ITEM_KEYS.filter(k => (gm.dealerItems[k] || 0) > 0);
-  if (!stealable.length) { playLog('Dealer has no items to steal', 'neutral'); return; }
-  const popup = document.createElement('div');
-  popup.className = 'steal-popup';
-  popup.onclick = e => e.stopPropagation();
-  stealable.forEach(k => {
-    const m = ITEM_META[k];
-    const btn = document.createElement('button');
-    btn.textContent = `${m.icon} ${m.label}`;
-    btn.onclick = () => stealItem(k);
-    popup.appendChild(btn);
-  });
-  chip.appendChild(popup);
-}
-document.addEventListener('click', () => {
-  const chip = document.getElementById('chip-adrenaline');
-  if (chip) { const p = chip.querySelector('.steal-popup'); if (p) p.remove(); }
-  stealMenuOpenState = false;
-});
-
-function stealItem(key) {
-  if (!gm || !gm.isPlayerTurn) return;
-  if ((gm.playerItems.adrenaline || 0) < 1) return;
-  if ((gm.dealerItems[key] || 0) < 1) return;
-  gm.playerItems.adrenaline--;
-  gm.dealerItems[key]--;
-  gm.playerItems[key] = Math.min(3, (gm.playerItems[key] || 0) + 1);
-  playLog(`You used 💉 Adrenaline — stole ${ITEM_META[key].icon} ${ITEM_META[key].label} from dealer`, 'good');
-  recordMove('player', `💉 Steal ${ITEM_META[key].label}`);
-  renderPlay();
-}
-
-// ── Use item (player) ──────────────────────────────────────────────────────
-function useItem(key) {
-  if (!gm || !gm.isPlayerTurn || gm.gameOver) return;
-  if ((gm.playerItems[key] || 0) < 1) return;
-
-  gm.playerItems[key]--;
-  const meta = ITEM_META[key];
-
-  if (key === 'beer') {
-    const ejected = gm.shells[gm.shellIdx];
-    gm.shellIdx++;
-    playLog(`You used 🍺 Beer — ejected a ${ejected} shell`, ejected === 'live' ? 'bad' : 'neutral');
-    recordMove('player', `🍺 Beer (ejected ${ejected})`);
-    gm.spyglassRevealed = null; gm.phoneRevealed = null;
-    if (gm.shellIdx >= gm.shells.length) { reloadChamber(); return; }
-  } else if (key === 'cig') {
-    if (gm.playerLives < gm.maxLives) { gm.playerLives++; playLog('You used 🚬 Cigarette — +1 life', 'good'); }
-    else playLog('You used 🚬 Cigarette — already at max lives', 'neutral');
-    recordMove('player', '🚬 Cigarette');
-  } else if (key === 'saw') {
-    gm.playerFx.saw = true;
-    playLog('You used 🪚 Handsaw — next shot deals ×2 damage', 'good');
-    recordMove('player', '🪚 Saw (active)');
-  } else if (key === 'jammer') {
-    gm.playerFx.jammer = true;
-    playLog('You used 📡 Jammer — will keep turn on next hit', 'good');
-    recordMove('player', '📡 Jammer (active)');
-  } else if (key === 'inverter') {
-    gm.playerFx.inverter = true;
-    playLog('You used 🔀 Inverter — next shell is flipped', 'good');
-    recordMove('player', '🔀 Inverter (active)');
-  } else if (key === 'spyglass') {
-    const next = gm.shells[gm.shellIdx];
-    gm.spyglassRevealed = next;
-    playLog(`You used 🔭 Spyglass — next shell is: ${next.toUpperCase()}`, next === 'live' ? 'bad' : 'good');
-    recordMove('player', `🔭 Spyglass (saw ${next})`);
-  } else if (key === 'phone') {
-    // Reveal a random unknown shell
-    const unknown = [];
-    for (let i = gm.shellIdx + 1; i < gm.shells.length; i++) unknown.push(i);
-    if (unknown.length === 0) {
-      playLog('You used 📱 Burner Phone — no further shells to peek', 'neutral');
-      recordMove('player', '📱 Phone (no shells)');
-      gm.playerItems[key]++; // refund
-    } else {
-      const idx = unknown[Math.floor(Math.random() * unknown.length)];
-      gm.phoneRevealed = { idx, type: gm.shells[idx] };
-      playLog(`You used 📱 Burner Phone — shell #${idx+1} is: ${gm.shells[idx].toUpperCase()}`, gm.shells[idx]==='live'?'bad':'good');
-      recordMove('player', `📱 Phone (shell #${idx+1} = ${gm.shells[idx]})`);
-    }
-  }
-
-  renderPlay();
-}
-
-// ── Player shoots ──────────────────────────────────────────────────────────
-function playerShoot(target) {
-  if (!gm || !gm.isPlayerTurn || gm.gameOver) return;
-
-  let shellType = gm.shells[gm.shellIdx];
-  if (gm.playerFx.inverter) { shellType = shellType === 'live' ? 'blank' : 'live'; gm.playerFx.inverter = false; }
-  const dmg = gm.playerFx.saw ? 2 : 1;
-  gm.playerFx.saw = false;
-
-  gm.shellIdx++;
-  gm.spyglassRevealed = null; gm.phoneRevealed = null;
-
-  let keepTurn = false;
-  let resultHtml = '';
-
-  if (target === 'opp') {
-    if (shellType === 'live') {
-      const actualDmg = Math.min(dmg, gm.dealerLives);
-      gm.dealerLives -= actualDmg;
-      const jammered = gm.playerFx.jammer;
-      if (jammered) { keepTurn = true; gm.playerFx.jammer = false; }
-      playLog(`You shot dealer — LIVE (${actualDmg} dmg)${jammered ? ' [Jammer: kept turn]' : ''}`, 'good');
-      recordMove('player', `🔫 Shoot Dealer — LIVE (${actualDmg} dmg)${jammered ? ' + Jammer' : ''}`);
-      resultHtml = `<div class="shot-result hit">🔫 HIT — Dealer takes ${actualDmg} damage</div>`;
-    } else {
-      playLog('You shot dealer — BLANK (no damage, turn ends)', 'neutral');
-      recordMove('player', '🔫 Shoot Dealer — BLANK');
-      resultHtml = `<div class="shot-result blank">○ Blank — turn passes to dealer</div>`;
-    }
-  } else {
-    if (shellType === 'blank') {
-      keepTurn = true;
-      playLog('You shot yourself — BLANK (keep turn!)', 'good');
-      recordMove('player', '🔫 Shoot Self — BLANK (kept turn)');
-      resultHtml = `<div class="shot-result good">○ Blank — you keep your turn!</div>`;
-    } else {
-      const actualDmg = Math.min(dmg, gm.playerLives);
-      gm.playerLives -= actualDmg;
-      playLog(`You shot yourself — LIVE (${actualDmg} dmg taken)`, 'bad');
-      recordMove('player', `🔫 Shoot Self — LIVE (${actualDmg} dmg)`);
-      resultHtml = `<div class="shot-result hit">💀 LIVE — you take ${actualDmg} damage</div>`;
-    }
-  }
-
-  showShotResult(resultHtml);
-
-  // Check game / round over
-  if (checkDeath()) return;
-
-  if (gm.shellIdx >= gm.shells.length) {
-    setTimeout(reloadChamber, 800);
-    return;
-  }
-
-  if (!keepTurn) {
-    gm.isPlayerTurn = false;
-    renderPlay();
-    setTimeout(runDealerTurn, 900);
-  } else {
-    renderPlay();
-  }
-}
-
-function showShotResult(html) {
-  const el = document.getElementById('play-shot-result');
-  if (el) { el.innerHTML = html; setTimeout(() => { if(el) el.innerHTML = ''; }, 2500); }
-}
-
-// ── Reload chamber ─────────────────────────────────────────────────────────
-function reloadChamber() {
-  gm.loadNum++;
-  playLog(`Chamber empty — reloading (load #${gm.loadNum})`, 'info');
-  dealNewLoad();
-}
-
-// ── Check for deaths / round/game over ─────────────────────────────────────
-function checkDeath() {
-  if (!gm) return false;
-  if (gm.dealerLives <= 0) {
-    endRound('player');
-    return true;
-  }
-  if (gm.playerLives <= 0) {
-    endRound('dealer');
-    return true;
-  }
-  return false;
-}
-
-// Round score tracking
-let roundWins = { player: 0, dealer: 0 };
-
-function endRound(winner) {
-  const cur = currentHistGame();
-  const roundIdx = gm.round - 1;
-  if (cur && cur.rounds[roundIdx]) cur.rounds[roundIdx].winner = winner;
-
-  if (winner === 'player') {
-    roundWins.player++;
-    playLog(`━━ ROUND ${gm.round} OVER — YOU WIN the round! ━━`, 'good');
-  } else {
-    roundWins.dealer++;
-    playLog(`━━ ROUND ${gm.round} OVER — DEALER WINS the round ━━`, 'bad');
-  }
-
-  gm.roundOver = true;
-
-  const isLastRound = gm.round >= gm.maxRounds;
-
-  if (isLastRound) {
-    endGame();
-    return;
-  }
-
-  // Show round over UI
-  const container = document.getElementById('play-round-over');
-  container.style.display = 'block';
-  const wonRound = winner === 'player';
-  container.innerHTML = `<div class="round-over-card">
-    <div class="round-over-title" style="color:${wonRound?'var(--green)':'var(--red)'}">${wonRound ? 'ROUND WON' : 'ROUND LOST'}</div>
-    <div class="round-over-sub">ROUND ${gm.round} OF ${gm.maxRounds} · YOU ${roundWins.player}-${roundWins.dealer} DEALER</div>
-    <div style="font-size:10px;letter-spacing:2px;color:var(--dimmer);margin-bottom:18px">Lives reset · New items for next round</div>
-    <button class="round-over-btn" onclick="nextRound()">▶ Next Round</button>
-  </div>`;
-}
-
-function nextRound() {
-  document.getElementById('play-round-over').style.display = 'none';
-  gm.round++;
-  gm.playerLives = gm.maxLives;
-  gm.dealerLives = gm.maxLives;
-  gm.loadNum = 1;
-  gm.playerItems = newItems(4);
-  gm.dealerItems  = newItems(4);
-  gm.isPlayerTurn = true;
-  gm.roundOver = false;
-  playLogEntries = [];
-  const cur = currentHistGame();
-  if (cur) cur.rounds.push({ round: gm.round, loads: [], winner: null });
-  playLog(`━━ ROUND ${gm.round} BEGINS ━━`, 'info');
-  dealNewLoad();
-}
-
-function endGame() {
-  const overall = roundWins.player > roundWins.dealer ? 'player' :
-                  roundWins.dealer > roundWins.player ? 'dealer' : 'draw';
-  const cur = currentHistGame();
-  if (cur) cur.outcome = overall === 'player' ? 'win' : overall === 'draw' ? 'draw' : 'loss';
-
-  const container = document.getElementById('play-round-over');
-  container.style.display = 'block';
-
-  let title, sub, btnCls, btnTxt;
-  if (overall === 'player') {
-    title = 'VICTORY'; sub = `YOU WIN ${roundWins.player}-${roundWins.dealer}`;
-    btnCls = 'round-over-btn'; btnTxt = '▶ Play Again';
-    title = `<div class="round-over-title victory-title">${title}</div>`;
-  } else if (overall === 'dealer') {
-    title = 'GAME OVER'; sub = `DEALER WINS ${roundWins.dealer}-${roundWins.player}`;
-    btnCls = 'round-over-btn gameover-btn'; btnTxt = '↺ Try Again';
-    title = `<div class="round-over-title gameover-title">${title}</div>`;
-  } else {
-    title = 'DRAW'; sub = `TIE — ${roundWins.player}-${roundWins.dealer}`;
-    btnCls = 'round-over-btn'; btnTxt = '↺ Play Again';
-    title = `<div class="round-over-title" style="color:var(--gold)">${title}</div>`;
-  }
-
-  container.innerHTML = `<div class="round-over-card">
-    ${title}
-    <div class="round-over-sub">${sub}</div>
-    <div style="font-size:10px;letter-spacing:2px;color:var(--dimmer);margin-bottom:18px">GAME COMPLETE — 3 ROUNDS FINISHED</div>
-    <button class="${btnCls}" onclick="newGame()">${btnTxt}</button>
-    <button class="round-over-btn" style="margin-left:10px" onclick="switchTab('history')">📋 View History</button>
-  </div>`;
-}
-
-function newGame() {
-  document.getElementById('play-round-over').style.display = 'none';
-  document.getElementById('play-game').style.display = 'none';
-  document.getElementById('play-start').style.display = 'block';
-  roundWins = { player: 0, dealer: 0 };
-  playLogEntries = [];
-  gm = null;
-}
-
-// ── Dealer AI turn ─────────────────────────────────────────────────────────
-function runDealerTurn() {
-  if (!gm || gm.isPlayerTurn || gm.gameOver || gm.roundOver) return;
-  if (!engineReady) {
-    // Fallback simple AI
-    dealerSimpleTurn();
-    return;
-  }
-  dealerEngineTurn();
-}
-
-function dealerSimpleTurn() {
-  // Simple heuristic if engine not loaded
-  const remaining = gm.shells.slice(gm.shellIdx);
-  const liveCount  = remaining.filter(x=>x==='live').length;
-  const blankCount = remaining.filter(x=>x==='blank').length;
-  const pLive = remaining.length > 0 ? liveCount / remaining.length : 0.5;
-
-  let move;
-  // Use items first if advantageous
-  if ((gm.dealerItems.saw||0) > 0 && pLive > 0.5) {
-    move = 'usesaw';
-  } else if ((gm.dealerItems.beer||0) > 0 && pLive < 0.35) {
-    move = 'usebeer';
-  } else if ((gm.dealerItems.spyglass||0) > 0 && pLive === 0.5) {
-    move = 'usespyglass';
-  } else if (pLive > 0.55 || gm.dealerFx.saw) {
-    move = 'shootopp';
-  } else {
-    move = 'shootself';
-  }
-  executeDealerMove(move);
-}
-
-function dealerEngineTurn() {
-  if (!engineReady || !platform) { dealerSimpleTurn(); return; }
-
-  // Build engine state from dealer's perspective:
-  // dealer = "my", player = "opp"
-  const remaining = gm.shells.slice(gm.shellIdx);
-  const live  = remaining.filter(x=>x==='live').length;
-  const blank = remaining.filter(x=>x==='blank').length;
-
-  platform.post('engine init');
-  platform.post(`engine s dshell ${live}`);
-  platform.post(`engine s bshell ${blank}`);
-
-  // Dealer is "my", player is "opp"
-  platform.post(`engine s my lives ${gm.dealerLives}`);
-  platform.post(`engine s my adrenaline ${gm.dealerItems.adrenaline||0}`);
-  platform.post(`engine s my beer ${gm.dealerItems.beer||0}`);
-  platform.post(`engine s my cig ${gm.dealerItems.cig||0}`);
-  platform.post(`engine s my inverter ${gm.dealerItems.inverter||0}`);
-  platform.post(`engine s my jammer ${gm.dealerItems.jammer||0}`);
-  platform.post(`engine s my phone ${gm.dealerItems.phone||0}`);
-  platform.post(`engine s my saw ${gm.dealerItems.saw||0}`);
-  platform.post(`engine s my spyglass ${gm.dealerItems.spyglass||0}`);
-
-  platform.post(`engine s opp lives ${gm.playerLives}`);
-  platform.post(`engine s opp adrenaline ${gm.playerItems.adrenaline||0}`);
-  platform.post(`engine s opp beer ${gm.playerItems.beer||0}`);
-  platform.post(`engine s opp cig ${gm.playerItems.cig||0}`);
-  platform.post(`engine s opp inverter ${gm.playerItems.inverter||0}`);
-  platform.post(`engine s opp jammer ${gm.playerItems.jammer||0}`);
-  platform.post(`engine s opp phone ${gm.playerItems.phone||0}`);
-  platform.post(`engine s opp saw ${gm.playerItems.saw||0}`);
-  platform.post(`engine s opp spyglass ${gm.playerItems.spyglass||0}`);
-
-  // Active effects for dealer ("my")
-  platform.post(`engine s my ju ${gm.dealerFx.jammer ? 1 : 0}`);
-  platform.post(`engine s my su ${gm.dealerFx.saw}`);
-  platform.post(`engine s my iu ${gm.dealerFx.inverter}`);
-  platform.post(`engine s opp ju ${gm.playerFx.jammer ? 1 : 0}`);
-  platform.post(`engine s opp su ${gm.playerFx.saw}`);
-  platform.post(`engine s opp iu ${gm.playerFx.inverter}`);
-
-  // Phone vec from dealer's perspective — all unknowns to engine
-  const phoneVec = new Array(remaining.length).fill(0);
-  platform.set_phone_vec(phoneVec, 'me');
-
-  try {
-    const reply = platform.post('engine go').split(' ');
-    const move  = reply[0];
-    executeDealerMove(move);
-  } catch(e) {
-    dealerSimpleTurn();
-  }
-}
-
-function executeDealerMove(move) {
-  if (!gm) return;
-  const mv = move.toLowerCase();
-  playLog(`Dealer: ${mv}`, 'engine');
-
-  // Item uses
-  if (mv === 'usebeer') {
-    if ((gm.dealerItems.beer||0) > 0) {
-      gm.dealerItems.beer--;
-      const ejected = gm.shells[gm.shellIdx];
-      gm.shellIdx++;
-      playLog(`Dealer used 🍺 Beer — ejected ${ejected}`, ejected==='live'?'good':'neutral');
-      recordMove('dealer', `🍺 Beer (ejected ${ejected})`);
-      if (gm.shellIdx >= gm.shells.length) { setTimeout(reloadChamber, 400); return; }
-      setTimeout(runDealerTurn, 700);
-      return;
-    }
-  } else if (mv === 'usecig') {
-    if ((gm.dealerItems.cig||0) > 0) {
-      gm.dealerItems.cig--;
-      if (gm.dealerLives < gm.maxLives) gm.dealerLives++;
-      playLog('Dealer used 🚬 Cigarette', 'neutral');
-      recordMove('dealer', '🚬 Cigarette');
-      renderPlay();
-      setTimeout(runDealerTurn, 700);
-      return;
-    }
-  } else if (mv === 'usesaw') {
-    if ((gm.dealerItems.saw||0) > 0) {
-      gm.dealerItems.saw--;
-      gm.dealerFx.saw = true;
-      playLog('Dealer used 🪚 Handsaw', 'neutral');
-      recordMove('dealer', '🪚 Saw (active)');
-      renderPlay();
-      setTimeout(runDealerTurn, 700);
-      return;
-    }
-  } else if (mv === 'usejammer') {
-    if ((gm.dealerItems.jammer||0) > 0) {
-      gm.dealerItems.jammer--;
-      gm.dealerFx.jammer = true;
-      playLog('Dealer used 📡 Jammer', 'neutral');
-      recordMove('dealer', '📡 Jammer (active)');
-      renderPlay();
-      setTimeout(runDealerTurn, 700);
-      return;
-    }
-  } else if (mv === 'useinverter') {
-    if ((gm.dealerItems.inverter||0) > 0) {
-      gm.dealerItems.inverter--;
-      gm.dealerFx.inverter = true;
-      playLog('Dealer used 🔀 Inverter', 'neutral');
-      recordMove('dealer', '🔀 Inverter (active)');
-      renderPlay();
-      setTimeout(runDealerTurn, 700);
-      return;
-    }
-  } else if (mv === 'usespyglass') {
-    if ((gm.dealerItems.spyglass||0) > 0) {
-      gm.dealerItems.spyglass--;
-      // Dealer peeks — no player benefit but we show it in log
-      const next = gm.shells[gm.shellIdx];
-      playLog(`Dealer used 🔭 Spyglass (peeked)`, 'neutral');
-      recordMove('dealer', `🔭 Spyglass (peeked ${next})`);
-      renderPlay();
-      setTimeout(runDealerTurn, 700);
-      return;
-    }
-  } else if (mv === 'usephone') {
-    if ((gm.dealerItems.phone||0) > 0) {
-      gm.dealerItems.phone--;
-      playLog('Dealer used 📱 Burner Phone (gathered info)', 'neutral');
-      recordMove('dealer', '📱 Phone');
-      renderPlay();
-      setTimeout(runDealerTurn, 700);
-      return;
-    }
-  } else if (mv.startsWith('useadrenaline')) {
-    if ((gm.dealerItems.adrenaline||0) > 0) {
-      // Steal from player
-      const stealable = ITEM_KEYS.filter(k => (gm.playerItems[k]||0) > 0);
-      if (stealable.length > 0) {
-        const target = mv.replace('useadrenaline','').replace('_','') || stealable[0];
-        const actualKey = stealable.includes(target) ? target : stealable[0];
-        gm.dealerItems.adrenaline--;
-        gm.playerItems[actualKey]--;
-        gm.dealerItems[actualKey] = Math.min(3, (gm.dealerItems[actualKey]||0)+1);
-        playLog(`Dealer used 💉 Adrenaline — stole ${ITEM_META[actualKey].icon} ${ITEM_META[actualKey].label}`, 'bad');
-        recordMove('dealer', `💉 Steal ${ITEM_META[actualKey].label}`);
-        renderPlay();
-        setTimeout(runDealerTurn, 700);
+    function renderLog() {
+      const el = document.getElementById("game-log");
+      if (gameLog.length === 0) {
+        el.innerHTML = '<div class="log-empty">— awaiting action —</div>';
         return;
       }
+      el.innerHTML = gameLog.map(e => `<div class="log-entry ${e.type}">${escHtml(e.msg)}</div>`).join("");
+      el.scrollTop = el.scrollHeight;
     }
-  }
 
-  // Shoot
-  let shellType = gm.shells[gm.shellIdx];
-  if (gm.dealerFx.inverter) { shellType = shellType==='live'?'blank':'live'; gm.dealerFx.inverter=false; }
-  const dmg = gm.dealerFx.saw ? 2 : 1;
-  gm.dealerFx.saw = false;
-  gm.shellIdx++;
-  gm.spyglassRevealed = null; gm.phoneRevealed = null;
-
-  const shootsSelf = mv === 'shootself';
-  let keepTurn = false;
-  let resultHtml = '';
-
-  if (!shootsSelf) {
-    // Dealer shoots player
-    if (shellType === 'live') {
-      const actualDmg = Math.min(dmg, gm.playerLives);
-      gm.playerLives -= actualDmg;
-      const jammered = gm.dealerFx.jammer;
-      if (jammered) { keepTurn = true; gm.dealerFx.jammer = false; }
-      playLog(`Dealer shot you — LIVE (${actualDmg} dmg)${jammered?' [Jammer]':''}`, 'bad');
-      recordMove('dealer', `🔫 Shoot Player — LIVE (${actualDmg} dmg)${jammered?' + Jammer':''}`);
-      resultHtml = `<div class="shot-result hit">💀 Dealer hits you — ${actualDmg} damage!</div>`;
-    } else {
-      playLog('Dealer shot you — BLANK (turn passes to you)', 'good');
-      recordMove('dealer', '🔫 Shoot Player — BLANK');
-      resultHtml = `<div class="shot-result blank">○ Dealer fired blank — your turn!</div>`;
+    function escHtml(s) {
+      return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
     }
-  } else {
-    // Dealer shoots self
-    if (shellType === 'blank') {
-      keepTurn = true;
-      playLog('Dealer shot itself — BLANK (dealer keeps turn)', 'neutral');
-      recordMove('dealer', '🔫 Shoot Self — BLANK (kept turn)');
-      resultHtml = `<div class="shot-result info">○ Dealer fired blank on itself — dealer's turn continues</div>`;
-    } else {
-      const actualDmg = Math.min(dmg, gm.dealerLives);
-      gm.dealerLives -= actualDmg;
-      playLog(`Dealer shot itself — LIVE (${actualDmg} dmg)`, 'good');
-      recordMove('dealer', `🔫 Shoot Self — LIVE (${actualDmg} dmg)`);
-      resultHtml = `<div class="shot-result good">💥 Dealer fires live on itself — ${actualDmg} damage!</div>`;
+
+    function openStealModal() {
+      if (!gs) return;
+      const btns = document.getElementById("steal-btns");
+      const stealable = STEALABLE.filter(t => gs.opp_items[t] > 0);
+      btns.innerHTML = stealable.map(tool =>
+        `<button onclick="handleSteal('${tool}')">${ITEM_META[tool].icon} ${ITEM_META[tool].label} ×${gs.opp_items[tool]}</button>`
+      ).join("") + `<button class="btn-cancel" onclick="closeStealModal()">Cancel</button>`;
+      document.getElementById("steal-modal").classList.add("open");
     }
-  }
+    function closeStealModal() {
+      document.getElementById("steal-modal").classList.remove("open");
+    }
+    function handleSteal(tool) {
+      if (!gs) return;
+      const ns = cloneState(gs);
+      ns.my_items.adrenaline -= 1;
+      ns.my_items[tool] = (ns.my_items[tool] || 0) + 1;
+      ns.opp_items[tool] = Math.max(0, (ns.opp_items[tool] || 0) - 1);
+      addLog(`Adrenaline: stole ${ITEM_META[tool].icon} ${ITEM_META[tool].label} from dealer`, "good");
+      closeStealModal();
+      gs = ns; render();
+    }
 
-  showShotResult(resultHtml);
-  if (checkDeath()) return;
 
-  if (gm.shellIdx >= gm.shells.length) { setTimeout(reloadChamber, 800); return; }
+    function doShot(state, target, fromPlayer) {
+      const total = state.dshell + state.bshell;
+      if (total === 0) return { state, isLive: false };
+      const inverting = fromPlayer ? state.my_items.inverter_using : state.opp_items.inverter_using;
+      const saw = fromPlayer ? state.my_items.saw_using : state.opp_items.saw_using;
 
-  if (!keepTurn) {
-    gm.isPlayerTurn = true;
-    renderPlay();
-  } else {
-    renderPlay();
-    setTimeout(runDealerTurn, 900);
-  }
-}
+      // Use shell sequence for actual shot resolution
+      let actualShell = shellSequence.length > 0 ? shellSequence[0] : (Math.random() < state.dshell / total ? "live" : "blank");
+      // Remove fired shell from sequence
+      if (shellSequence.length > 0) shellSequence.shift();
 
-// ── History recording ──────────────────────────────────────────────────────
-let gameHistoryRecords = [];
-function recordMove(who, desc) {
-  if (!gm) return;
-  const cur = currentHistGame();
-  if (!cur) return;
-  const roundIdx = gm.round - 1;
-  if (!cur.rounds[roundIdx]) return;
-  const loads = cur.rounds[roundIdx].loads;
-  if (!loads || loads.length === 0) return;
-  const curLoad = loads[loads.length - 1];
-  if (curLoad && curLoad.moves) curLoad.moves.push({ who, desc, ts: new Date().toLocaleTimeString() });
-}
-
-// ── History render ─────────────────────────────────────────────────────────
-function renderHistory() {
-  const el = document.getElementById('hist-content');
-  if (!el) return;
-  if (gameHistoryRecords.length === 0) {
-    el.innerHTML = '<div class="hist-empty">— No games played yet —</div>';
-    return;
-  }
-  let html = '';
-  for (let gi = gameHistoryRecords.length - 1; gi >= 0; gi--) {
-    const g = gameHistoryRecords[gi];
-    const oc = g.outcome;
-    const ocLabel = oc === 'win' ? '✓ WIN' : oc === 'loss' ? '✗ LOSS' : oc === 'draw' ? '— DRAW' : '… ongoing';
-    const ocCls   = oc === 'win' ? 'win' : oc === 'loss' ? 'loss' : 'ongoing';
-    html += `<div class="hist-game">
-      <div class="hist-game-hdr" onclick="toggleHistGame(${gi})">
-        <div class="hist-game-title ${ocCls}">Game ${g.id} — ${ocLabel}</div>
-        <div class="hist-game-meta">${g.startTime} ▾</div>
-      </div>
-      <div class="hist-game-body" id="hist-game-${gi}">`;
-    if (!g.rounds || g.rounds.length === 0) {
-      html += '<div style="font-size:11px;color:var(--dimmer)">No rounds recorded.</div>';
-    } else {
-      for (const rd of g.rounds) {
-        const rw = rd.winner === 'player' ? '✓ Player' : rd.winner === 'dealer' ? '✗ Dealer' : '…';
-        html += `<div class="hist-round">
-          <div class="hist-round-title">Round ${rd.round} — ${rw}</div>`;
-        if (rd.loads) {
-          for (const ld of rd.loads) {
-            html += `<div style="font-size:10px;color:var(--dimmer);letter-spacing:1px;margin-bottom:4px">Chamber ${ld.loadNum}: ${ld.live}L / ${ld.blank}B</div>`;
-            if (ld.moves && ld.moves.length) {
-              for (const m of ld.moves) {
-                const isPlayer = m.who === 'player';
-                html += `<div class="hist-move">
-                  <span class="who${isPlayer?'':' d'}">${isPlayer?'YOU':'DEALER'}</span>
-                  <span style="color:var(--dimmer)"> › </span>
-                  <span class="act${m.desc.includes('Shoot')?m.desc.includes('LIVE')?' shoot':' blank':' item'}">${esc(m.desc)}</span>
-                </div>`;
-              }
-            } else {
-              html += `<div style="font-size:10px;color:var(--dimmer)">No moves.</div>`;
-            }
-          }
+      // Inverter flips what we "get": live becomes blank effect and vice versa
+      const isLive = inverting ? (actualShell === "blank") : (actualShell === "live");
+      const dmg = saw ? 2 : 1;
+      const shellName = isLive ? "🔴 LIVE" : "⚪ BLANK";
+      const ns = cloneState(state);
+      if (actualShell === "live") ns.dshell -= 1; else ns.bshell -= 1;
+      if (fromPlayer) {
+        ns.my_items.saw_using = false; ns.my_items.inverter_using = false;
+        if (ns.my_items.jammer_using > 0) ns.my_items.jammer_using -= 1;
+      } else {
+        ns.opp_items.saw_using = false; ns.opp_items.inverter_using = false;
+        if (ns.opp_items.jammer_using > 0) ns.opp_items.jammer_using -= 1;
+      }
+      if (target === "opp") {
+        const victim = fromPlayer ? "opp_items" : "my_items";
+        if (isLive) {
+          ns[victim].lives = Math.max(0, ns[victim].lives - dmg);
+          addLog(`${fromPlayer ? "You" : "Dealer"} shot ${fromPlayer ? "dealer" : "you"} — ${shellName}! ${dmg} damage`, fromPlayer ? "good" : "damage");
+        } else {
+          addLog(`${fromPlayer ? "You" : "Dealer"} shot ${fromPlayer ? "dealer" : "you"} — ${shellName}. Miss`, "neutral");
         }
-        html += `</div>`;
+      } else {
+        const self = fromPlayer ? "my_items" : "opp_items";
+        if (isLive) {
+          ns[self].lives = Math.max(0, ns[self].lives - dmg);
+          addLog(`${fromPlayer ? "You" : "Dealer"} shot self — ${shellName}! ${dmg} damage`, fromPlayer ? "damage" : "good");
+        } else {
+          addLog(`${fromPlayer ? "You" : "Dealer"} shot self — ${shellName}. Blank (keep turn)`, fromPlayer ? "good" : "opp");
+        }
+      }
+      return { state: ns, isLive };
+    }
+
+    function generateShellSequence(dshell, bshell) {
+      const arr = [];
+      for (let i = 0; i < dshell; i++) arr.push("live");
+      for (let i = 0; i < bshell; i++) arr.push("blank");
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function newItems() {
+      return { lives: 0, saw: 0, inverter: 0, adrenaline: 0, beer: 0, jammer: 0, cig: 0, spyglass: 0, phone: 0, jammer_using: 0, saw_using: false, inverter_using: false };
+    }
+
+    function reloadShells(state, nextTurnIsPlayer) {
+      const totalShells = 2 + Math.floor(Math.random() * 6);
+      const dshell = 1 + Math.floor(Math.random() * (totalShells - 1));
+      const bshell = totalShells - dshell;
+      const itemPool = ["saw", "beer", "cig", "inverter", "jammer", "adrenaline", "spyglass", "phone"];
+      function giveItems(items) {
+        const it = newItems();
+        it.lives = items.lives;
+        const count = Math.floor(Math.random() * 4);
+        for (let i = 0; i < count; i++) {
+          const item = itemPool[Math.floor(Math.random() * itemPool.length)];
+          it[item] = Math.min((it[item] || 0) + 1, 3);
+        }
+        return it;
+      }
+      shellSequence = generateShellSequence(dshell, bshell);
+      gs = { dshell, bshell, my_items: giveItems(state.my_items), opp_items: giveItems(state.opp_items) };
+      addLog(`── Reload ── ${dshell} live / ${bshell} blank`, "info");
+      render();
+      if (nextTurnIsPlayer) {
+        thinking = false;
+        playerTurn = true;
+        render();
+      } else {
+        playerTurn = false;
+        thinking = true;
+        render();
+        setTimeout(() => doAITurn(gs), 900);
       }
     }
-    html += `</div></div>`;
-  }
-  el.innerHTML = html;
-}
 
-function toggleHistGame(idx) {
-  const body = document.getElementById(`hist-game-${idx}`);
-  if (!body) return;
-  body.style.display = body.style.display === 'none' ? 'block' : 'none';
-}
+    function checkEnd(state, keepTurnOnEmpty) {
+      if (state.my_items.lives <= 0) {
+        gs = state; phase = "lose";
+        addLog("💀 You have been eliminated.", "damage");
+        renderEndScreen(false);
+        render();
+        return true;
+      }
+      if (state.opp_items.lives <= 0) {
+        gs = state; phase = "win";
+        addLog("✓ Dealer eliminated.", "good");
+        renderEndScreen(true);
+        render();
+        return true;
+      }
+      if (state.dshell === 0 && state.bshell === 0) {
+        gs = state;
+        addLog("Shells exhausted — reloading...", "neutral");
+        render();
+        setTimeout(() => reloadShells(state, keepTurnOnEmpty), 900);
+        return true;
+      }
+      return false;
+    }
 
-// ── Init ───────────────────────────────────────────────────────────────────
-renderAll();
-renderLog();
+    // ─── RENDER ──────────────────────────────────────────────────────────────────
 
+    function render() {
+      renderShells();
+      renderPanels();
+      renderActions();
+      renderWinOdds();
+      renderTurnIndicator();
+      renderStatusBar();
+      renderLog();
+    }
+
+    function renderShells() {
+      if (!gs) return;
+      const row = document.getElementById("shells-row");
+      const shells = [];
+      for (let i = 0; i < gs.dshell; i++) shells.push("live");
+      for (let i = 0; i < gs.bshell; i++) shells.push("blank");
+      // shuffle display order (don't reveal sequence)
+      shells.sort(() => Math.random() - 0.5);
+      row.innerHTML =
+        `<span class="shells-label">SHELLS</span>` +
+        shells.map(t => `<div class="shell ${t}">${t === "live" ? "◆" : "○"}</div>`).join("") +
+        `<span class="shells-count">${gs.dshell}L / ${gs.bshell}B</span>`;
+    }
+
+    function renderLives(el, count, max = 4) {
+      el.innerHTML = Array.from({length: max}, (_, i) =>
+        `<span class="heart${i < count ? "" : " dead"}">${i < count ? "♥" : "♡"}</span>`
+      ).join("");
+    }
+
+    function renderItems(el, items, isPlayer) {
+      const display = [];
+      for (const [key, meta] of Object.entries(ITEM_META)) {
+        const count = items[key] || 0;
+        for (let i = 0; i < count; i++) display.push({ key: `${key}_${i}`, tool: key, meta, active: isPlayer });
+      }
+      if (items.saw_using) display.push({ key: "saw_act", tool: null, meta: { icon: "🪚", label: "Saw Active" }, active: true });
+      if (items.inverter_using) display.push({ key: "inv_act", tool: null, meta: { icon: "🔀", label: "Inverted" }, active: true });
+      if (items.jammer_using > 0) display.push({ key: "jam_act", tool: null, meta: { icon: "📡", label: "Jamming" }, active: true });
+
+      if (display.length === 0) { el.innerHTML = '<span class="no-items">— no items —</span>'; return; }
+      el.innerHTML = display.map(({meta, active}) =>
+        `<span class="item-badge${active ? " active" : ""}" title="${meta.desc || ""}">${meta.icon} ${meta.label}</span>`
+      ).join("");
+    }
+
+    function renderPanels() {
+      if (!gs) return;
+      renderLives(document.getElementById("lives-player"), gs.my_items.lives);
+      renderLives(document.getElementById("lives-dealer"), gs.opp_items.lives);
+      renderItems(document.getElementById("items-player"), gs.my_items, true);
+      renderItems(document.getElementById("items-dealer"), gs.opp_items, false);
+
+      const pp = document.getElementById("panel-player");
+      const pd = document.getElementById("panel-dealer");
+      if (phase === "playing") {
+        pp.classList.toggle("active", playerTurn && !thinking);
+        pd.classList.toggle("active", !playerTurn || thinking);
+      } else {
+        pp.classList.remove("active");
+        pd.classList.remove("active");
+      }
+    }
+
+    function probStealopp(s, tool) {
+      const distinct = STEALABLE.filter(t => s.opp_items[t] > 0).length;
+      if (distinct === 0) return 0;
+      return s.opp_items[tool] > 0 ? 1.0 / distinct : 0;
+    }
+
+    function generateMoves(s) {
+      const moves = [];
+      if (s.dshell > 0 || s.bshell > 0) { moves.push("ShootOpp"); moves.push("ShootSelf"); }
+      if (!s.my_items.inverter_using) {
+        if (s.my_items.beer > 0 && (s.dshell > 0 || s.bshell > 0)) moves.push("UseBeer");
+        if (s.my_items.cig > 0 && s.my_items.lives < 4 && s.my_items.lives > 1) moves.push("UseCig");
+        if (s.my_items.jammer > 0 && s.my_items.jammer_using === 0) moves.push("UseJammer");
+        if (s.my_items.saw > 0 && !s.my_items.saw_using) moves.push("UseSaw");
+        if (s.my_items.inverter > 0) moves.push("UseInverter");
+        if (s.my_items.adrenaline > 0) {
+          for (const t of STEALABLE) { if (probStealopp(s, t) > 0) moves.push("UseAdrenaline" + t); }
+        }
+        // Spyglass: only if we don't already know the next shell
+        if (s.my_items.spyglass > 0 && !s.my_items._knownNext && (s.dshell + s.bshell) > 0) moves.push("UseSpyGlass");
+        // Phone: only if 3+ shells and we don't already have full info
+        if (s.my_items.phone > 0 && (s.dshell + s.bshell) >= 3) moves.push("UsePhone");
+      }
+      return moves;
+    }
+
+    function renderActions() {
+      const area = document.getElementById("action-area");
+      if (phase !== "playing" || !playerTurn || thinking || !gs) {
+        area.style.display = "none";
+        return;
+      }
+      area.style.display = "block";
+
+      const moves = generateMoves(gs);
+      const canShootOpp = moves.includes("ShootOpp");
+      const canShootSelf = moves.includes("ShootSelf");
+      const canAdrenaline = gs.my_items.adrenaline > 0 && STEALABLE.some(t => gs.opp_items[t] > 0);
+
+      const grid = document.getElementById("btn-grid");
+      let btns = "";
+      btns += `<button class="btn-shoot" ${canShootOpp ? "" : "disabled"} onclick="playerAction('ShootOpp')">🔫 Shoot Dealer</button>`;
+      btns += `<button class="btn-self" ${canShootSelf ? "" : "disabled"} onclick="playerAction('ShootSelf')">🔫 Shoot Self</button>`;
+      if (gs.my_items.beer > 0) btns += `<button onclick="playerAction('UseBeer')">🍺 Beer</button>`;
+      if (gs.my_items.cig > 0 && gs.my_items.lives < 4 && gs.my_items.lives > 1) btns += `<button onclick="playerAction('UseCig')">🚬 Cigarette</button>`;
+      if (gs.my_items.saw > 0 && !gs.my_items.saw_using) btns += `<button onclick="playerAction('UseSaw')">🪚 Handsaw</button>`;
+      if (gs.my_items.jammer > 0 && gs.my_items.jammer_using === 0) btns += `<button onclick="playerAction('UseJammer')">📡 Jammer</button>`;
+      if (gs.my_items.inverter > 0) btns += `<button onclick="playerAction('UseInverter')">🔀 Inverter</button>`;
+      if (canAdrenaline) btns += `<button onclick="playerAction('UseAdrenaline')">💉 Adrenaline</button>`;
+      if (gs.my_items.spyglass > 0 && shellSequence.length > 0) btns += `<button onclick="playerAction('UseSpyGlass')">🔭 Spyglass</button>`;
+      const totalShells = gs.dshell + gs.bshell;
+      if (gs.my_items.phone > 0 && totalShells >= 3 && shellSequence.length >= 2) btns += `<button onclick="playerAction('UsePhone')">📱 Burner Phone</button>`;
+      grid.innerHTML = btns;
+
+      const warn = document.getElementById("warnings");
+      let warnings = "";
+      if (gs.my_items.saw_using) warnings += `<span style="color:var(--gold)">⚠ Saw active — next shot deals 2 damage</span>`;
+      if (gs.my_items.inverter_using) warnings += `<span style="color:var(--purple)">⚠ Inverter active — shell type inverted</span>`;
+      if (gs.my_items.jammer_using > 0) warnings += `<span style="color:var(--green)">⚠ Jammer active — keep turn after hitting dealer</span>`;
+      warn.innerHTML = warnings;
+    }
+
+    function renderWinOdds() {
+      const el = document.getElementById("win-odds-text");
+      el.textContent = `WIN ODDS: ${winChance}%`;
+      el.style.color = winChance > 60 ? "var(--green)" : winChance < 40 ? "var(--red)" : "var(--gold)";
+    }
+
+    function renderTurnIndicator() {
+      const el = document.getElementById("turn-indicator");
+      if (phase !== "playing") { el.textContent = ""; return; }
+      if (thinking) { el.style.color = "var(--purple)"; el.textContent = "DEALER THINKING..."; }
+      else if (playerTurn) { el.style.color = "var(--gold)"; el.textContent = "YOUR TURN"; }
+      else { el.style.color = "var(--text-dim)"; el.textContent = "DEALER'S TURN"; }
+    }
+
+    function renderStatusBar() {
+      const el = document.getElementById("status-bar");
+      if (phase === "playing") el.textContent = `${playerTurn ? "YOUR MOVE" : (thinking ? "CALCULATING..." : "WAITING")} · WIN ${winChance}%`;
+      else el.textContent = phase === "setup" ? "BUCKSHOT ROULETTE" : (phase === "win" ? "DEALER DOWN" : "GAME OVER");
+    }
+
+    function renderEndScreen(win) {
+      const overlay = document.getElementById("end-overlay");
+      overlay.classList.add("open");
+      document.getElementById("end-emoji").textContent = win ? "💀" : "🩸";
+      const title = document.getElementById("end-title");
+      title.textContent = win ? "DEALER DOWN" : "YOU'RE DEAD";
+      title.className = "end-title " + (win ? "win" : "lose");
+      document.getElementById("end-subtitle").textContent = win ? "THE HOUSE LOSES TODAY" : "THE HOUSE ALWAYS WINS";
+      document.getElementById("action-area").style.display = "none";
+    }
+
+function playerAction(mv) {
+      if (!playerTurn || phase !== "playing" || thinking) return;
+      let ns = cloneState(gs);
+
+      if (mv === "ShootOpp") {
+        const hadJammer = gs.my_items.jammer_using > 0;
+        const { state, isLive } = doShot(ns, "opp", true);
+        ns = state;
+        const keepTurn = hadJammer;
+        if (checkEnd(ns, keepTurn)) return;
+        gs = ns;
+        if (!keepTurn) {
+          playerTurn = false;
+          render();
+          setTimeout(() => doAITurn(ns), 800);
+        } else {
+          render();
+        }
+        return;
+      }
+
+      if (mv === "ShootSelf") {
+        const { state, isLive } = doShot(ns, "self", true);
+        ns = state;
+        if (isLive) {
+          if (checkEnd(ns, false)) return;
+          gs = ns; playerTurn = false;
+          render();
+          setTimeout(() => doAITurn(ns), 800);
+        } else {
+          if (checkEnd(ns, true)) return;
+          gs = ns;
+          render();
+        }
+        return;
+      }
+
+      if (mv === "UseBeer") {
+        const total = ns.dshell + ns.bshell;
+        if (total === 0) return;
+        const ejectedShell = shellSequence.length > 0 ? shellSequence.shift() : (Math.random() < ns.dshell / total ? "live" : "blank");
+        const isLive = ejectedShell === "live";
+        if (isLive) { ns.dshell -= 1; addLog("Beer: ejected 🔴 LIVE shell", "good"); }
+        else { ns.bshell -= 1; addLog("Beer: ejected ⚪ BLANK shell", "neutral"); }
+        ns.my_items.beer -= 1;
+        if (checkEnd(ns, true)) return;
+        gs = ns; render(); return;
+      }
+      if (mv === "UseCig") {
+        ns.my_items.lives = Math.min(4, ns.my_items.lives + 1);
+        ns.my_items.cig -= 1;
+        addLog("Cigarette: +1 life", "good");
+        gs = ns; render(); return;
+      }
+      if (mv === "UseSaw") {
+        ns.my_items.saw_using = true; ns.my_items.saw -= 1;
+        addLog("Handsaw: next shot deals 2 damage", "info");
+        gs = ns; render(); return;
+      }
+      if (mv === "UseJammer") {
+        ns.my_items.jammer_using = 1; ns.my_items.jammer -= 1;
+        addLog("Jammer: keep turn after shooting opponent", "info");
+        gs = ns; render(); return;
+      }
+      if (mv === "UseInverter") {
+        ns.my_items.inverter_using = true; ns.my_items.inverter -= 1;
+        addLog("Inverter: next shot inverted", "info");
+        gs = ns; render(); return;
+      }
+      if (mv === "UseAdrenaline") {
+        openStealModal();
+        return;
+      }
+      if (mv === "UseSpyGlass") {
+        const next = shellSequence[0];
+        ns.my_items.spyglass -= 1;
+        const reveal = next === "live" ? "🔴 LIVE" : "⚪ BLANK";
+        addLog(`Spyglass: current chamber is ${reveal}`, "info");
+        gs = ns; render(); return;
+      }
+      if (mv === "UsePhone") {
+        const total = ns.dshell + ns.bshell;
+        if (total < 3) return;
+        // Pick a random shell from position 1 onward (not current chamber)
+        const idx = 1 + Math.floor(Math.random() * (shellSequence.length - 1));
+        const revealed = shellSequence[idx];
+        const reveal = revealed === "live" ? "🔴 LIVE" : "⚪ BLANK";
+        ns.my_items.phone -= 1;
+        addLog(`Burner Phone: shell #${idx + 1} in chamber is ${reveal}`, "info");
+        gs = ns; render(); return;
+      }
+    }
+
+
+// ─── WASM ENGINE INIT ────────────────────────────────────────────────────────
 (async () => {
   try {
     const { default: init, Interface } = await import("./buckshot.js");
     await init();
-    platform = new Interface();
+    const platform = new Interface();
     platform.post("engine init");
-    engineReady = true;
-    document.getElementById("engine-status").textContent = "▸ Engine ready";
-    document.getElementById("engine-status").style.color = "var(--green)";
-    addLog("Buckshot engine loaded and ready", "good");
-    updateAnalyzeBtn();
+    
+    console.log("Wasm engine loaded");
+
+    // ─── GAME ENGINE ─────────────────────────────────────────────────────────────
+
+    function flipState(s) { return { dshell: s.dshell, bshell: s.bshell, my_items: cloneItems(s.opp_items), opp_items: cloneItems(s.my_items) }; }
+
+    // ─── GAME SETUP ──────────────────────────────────────────────────────────────
+
+    document.querySelectorAll('.btn-begin').forEach(btn => {
+        btn.addEventListener("click", startGame);
+    });
+
+    function randomSetup() {
+      const totalShells = 2 + Math.floor(Math.random() * 6);
+      const dshell = 1 + Math.floor(Math.random() * (totalShells - 1));
+      const bshell = totalShells - dshell;
+      const startLives = 4;
+      const itemPool = ["saw", "beer", "cig", "inverter", "jammer", "adrenaline", "spyglass", "phone"];
+      function randomItems() {
+        const it = newItems();
+        it.lives = startLives;
+        const count = Math.floor(Math.random() * 4);
+        for (let i = 0; i < count; i++) {
+          const item = itemPool[Math.floor(Math.random() * itemPool.length)];
+          if (it[item] !== undefined) it[item] = Math.min((it[item] || 0) + 1, 3);
+        }
+        return it;
+      }
+      shellSequence = generateShellSequence(dshell, bshell);
+      return { dshell, bshell, my_items: randomItems(), opp_items: randomItems() };
+    }
+
+    // ─── GAME FLOW ────────────────────────────────────────────────────────────────
+
+    function startGame() {
+      gs = randomSetup();
+      playerTurn = true;
+      phase = "playing";
+      thinking = false;
+      gameLog = [];
+
+      platform.post("engine init");
+
+      document.getElementById("setup-screen").style.display = "none";
+      document.getElementById("game-screen").style.display = "block";
+      document.getElementById("end-overlay").classList.remove("open");
+
+      addLog(`New round — ${gs.dshell} live, ${gs.bshell} blank`, "info");
+      addLog(`Your lives: ${gs.my_items.lives} | Dealer lives: ${gs.opp_items.lives}`, "info");
+      render();
+    }
+
+    // ─── AI ──────────────────────────────────────────────────────────────────────
+function loadPerson(person, items) {
+    platform.post(`engine s ${person} lives ${items.lives}`);
+    platform.post(`engine s ${person} adrenaline ${items.adrenaline}`);
+    platform.post(`engine s ${person} beer ${items.beer}`);
+    platform.post(`engine s ${person} cig ${items.cig}`);
+    platform.post(`engine s ${person} inverter ${items.inverter}`);
+    platform.post(`engine s ${person} jammer ${items.jammer}`);
+    platform.post(`engine s ${person} phone ${items.phone}`);
+    platform.post(`engine s ${person} saw ${items.saw}`);
+    platform.post(`engine s ${person} spyglass ${items.spyglass}`);
+}
+
+function loadEngine(state) {
+    platform.post(`engine s dshell ${state.dshell}`);
+    platform.post(`engine s bshell ${state.bshell}`);
+    loadPerson("my", state.my_items);
+    loadPerson("opp", state.opp_items);
+}
+
+window.doAITurn = (state) => {
+    thinking = true;
+    render();
+    const flipped = flipState(state);
+
+    loadEngine(flipped);
+
+    // Inject spyglass result if dealer had used spyglass (opp before flip = my after flip)
+    if (state.opp_items.spyglass_result !== undefined && state.opp_items.spyglass_result !== null) {
+        const spyCmd = state.opp_items.spyglass_result ? "ds" : "bs";
+        platform.post(`engine commit ${spyCmd}`);
+    }
+
+    platform.post("engine print");
+    const reply = platform.post("engine go").split(" ");
+    winChance = 100 - Number(reply[1]);
+    setTimeout(() => simulateAI(state, reply[0]), 400);
+}
+
+    function simulateAI(state, mv) {
+        mv = mv.toLowerCase();
+      if (mv === "shootopp") {
+        const hadJammer = state.opp_items.jammer_using > 0;
+        const { state: ns, isLive } = doShot(state, "opp", false);
+        ns.opp_items._knownNext = undefined;
+        const keepTurn = hadJammer;
+        if (checkEnd(ns, !keepTurn)) { thinking = false; return; }
+        gs = ns; render();
+        if (keepTurn) setTimeout(() => doAITurn(ns), 700);
+        else { thinking = false; playerTurn = true; render(); }
+        return;
+      }
+      if (mv === "shootself") {
+        const { state: ns, isLive } = doShot(state, "self", false);
+        ns.opp_items._knownNext = undefined;
+        if (isLive) {
+          if (checkEnd(ns, true)) { thinking = false; return; }
+          gs = ns; thinking = false; playerTurn = true; render();
+        } else {
+          if (checkEnd(ns, false)) { thinking = false; return; }
+          gs = ns; render();
+          setTimeout(() => doAITurn(ns), 700);
+        }
+        return;
+      }
+
+      let ns = cloneState(state);
+      if (mv === "usebeer") {
+        const total = ns.dshell + ns.bshell;
+        if (total > 0) {
+          const ejectedShell = shellSequence.length > 0 ? shellSequence.shift() : (Math.random() < ns.dshell / total ? "live" : "blank");
+          if (ejectedShell === "live") { ns.dshell -= 1; addLog("Dealer used Beer — ejected 🔴 LIVE", "opp"); }
+          else { ns.bshell -= 1; addLog("Dealer used Beer — ejected ⚪ BLANK", "opp"); }
+          ns.opp_items.beer -= 1;
+          platform.post("engine commit");
+        }
+        if (checkEnd(ns, false)) { thinking = false; return; }
+      } else if (mv === "usecig") {
+        ns.opp_items.lives = Math.min(4, ns.opp_items.lives + 1);
+        ns.opp_items.cig -= 1;
+        platform.post("engine commit");
+        addLog("Dealer used Cigarette: +1 life", "opp");
+      } else if (mv === "usesaw") {
+        ns.opp_items.saw_using = true; ns.opp_items.saw -= 1;
+        addLog("Dealer used Handsaw", "opp");
+        platform.post("engine commit");
+      } else if (mv === "usejammer") {
+        ns.opp_items.jammer_using = 1; ns.opp_items.jammer -= 1;
+        addLog("Dealer used Jammer", "opp");
+        platform.post("engine commit");
+      } else if (mv === "useinverter") {
+        ns.opp_items.inverter_using = true; ns.opp_items.inverter -= 1;
+        addLog("Dealer used Inverter", "opp");
+        platform.post("engine commit");
+      } else if (mv.startsWith("useadrenaline")) {
+        const tool = mv.split("_")[1];
+        ns.opp_items.adrenaline -= 1;
+        ns.opp_items[tool] = Math.min((ns.opp_items[tool] || 0) + 1, 3);
+        ns.my_items[tool] = Math.max(0, (ns.my_items[tool] || 0) - 1);
+        addLog(`Dealer stole your ${ITEM_META[tool]?.icon} ${ITEM_META[tool]?.label}`, "damage");
+        platform.post("engine commit");
+      } else if (mv === "usespyglass") {
+        const next = shellSequence[0];
+        ns.opp_items.spyglass -= 1;
+        ns.opp_items._knownNext = next;
+        addLog(`Dealer used Spyglass — peering into the chamber...`, "opp");
+        // Pass ds (live) or bs (blank) so engine knows what was revealed
+        const spyResult = next === "live" ? "ds" : "bs";
+        platform.post(`engine commit ${spyResult}`);
+        } else if (mv === "usephone") {
+        const idx = 1 + Math.floor(Math.random() * (shellSequence.length - 1));
+        const revealed = shellSequence[idx];
+        ns.opp_items.phone -= 1;
+        addLog(`Dealer used Burner Phone — checking a shell position...`, "opp");
+        // Pass ds/bs + 1-indexed position
+        const phoneResult = revealed === "live" ? "ds" : "bs";
+        platform.post(`engine commit ${phoneResult} ${idx + 1}`);
+        }
+      gs = ns; render();
+      setTimeout(() => doAITurn(ns), 600);
+    }
+
   } catch(e) {
-    document.getElementById("engine-status").textContent = "▸ Engine not found (buckshot.js / buckshot.wasm missing)";
-    document.getElementById("engine-status").style.color = "var(--red)";
-    addLog("Engine failed to load: " + e.message, "bad");
-    addLog("Place buckshot.js and buckshot.wasm in the same directory", "neutral");
+    console.log("Wasm engine not found — using JS fallback:", e.message);
+    window.platform = null;
   }
 })();
 </script>
