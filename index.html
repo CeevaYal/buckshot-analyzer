@@ -1358,6 +1358,20 @@ function runAnalysis(){
   platform.post(`engine s opp ju ${oppFx.jammer_using}`);
   platform.post(`engine s opp su ${oppFx.saw_using}`);
   platform.post(`engine s opp iu ${oppFx.inverter_using}`);
+  // If the sequence fully covers all shells and all are known, recalculate
+  // dshell/bshell from it so the engine counts match the phone vec exactly.
+  // A mismatch (e.g. sequence says 3 live but dshell=2) causes the engine to crash.
+  const seqKnown = shellSequence.filter(x => x !== "unknown");
+  const seqFull  = shellSequence.length === total && seqKnown.length === total;
+  if (seqFull) {
+    const seqLive  = shellSequence.filter(x => x === "live").length;
+    const seqBlank = shellSequence.filter(x => x === "blank").length;
+    if (seqLive !== st.dshell || seqBlank !== st.bshell) {
+      addLog(`Sequence mismatch fixed: counts ${st.dshell}L/${st.bshell}B → ${seqLive}L/${seqBlank}B`, "engine");
+      platform.post(`engine s dshell ${seqLive}`);
+      platform.post(`engine s bshell ${seqBlank}`);
+    }
+  }
   const phoneVec=Array.from({length:total},(_,i)=>{const s=shellSequence[i];if(s==="live")return 1;if(s==="blank")return 2;return 0;});
   platform.set_phone_vec(phoneVec,"me");
   if(phoneVec.some(v=>v!==0)) addLog(`Phone vec: [${phoneVec.join(", ")}]`,"engine");
@@ -1633,8 +1647,15 @@ function renderPlayItems(gridId, items, isPlayer) {
     const count = items[key] || 0;
     if (!isPlayer && count === 0) continue; // hide zero dealer items
     const phoneUnavail = key === 'phone' && (gm.shellIdx + 1 >= gm.shells.length);
-    const disabled = !isPlayer || count === 0 || !gm.isPlayerTurn || gm.gameOver || (key === 'cig' && gm.playerLives <= 1) || phoneUnavail;
-    const tip = (isPlayer && !disabled) ? `data-tip="${meta.desc}"` : '';
+    // Gray out one-shot active effects already triggered this turn
+    const alreadyActive = isPlayer && (
+      (key === 'saw'      && gm.playerFx.saw)      ||
+      (key === 'jammer'   && gm.playerFx.jammer)   ||
+      (key === 'inverter' && gm.playerFx.inverter)
+    );
+    const disabled = !isPlayer || count === 0 || !gm.isPlayerTurn || gm.gameOver || (key === 'cig' && (gm.playerLives <= 1 || gm.playerLives >= gm.maxLives)) || phoneUnavail || alreadyActive;
+    const cigAtMax = isPlayer && key === 'cig' && gm.playerLives >= gm.maxLives;
+    const tip = (isPlayer && !disabled) ? `data-tip="${meta.desc}"` : (alreadyActive ? `data-tip="Already active this turn"` : (cigAtMax ? `data-tip="Already at max health"` : ''));
     if (key === 'adrenaline' && isPlayer && count > 0) {
       // Render with steal popup — stop propagation so document click doesn't immediately close it
       html += `<div class="use-chip${disabled?' disabled':''}" ${tip} style="position:relative" id="chip-adrenaline" onclick="${disabled?'':'event.stopPropagation();toggleStealMenu()'}">
@@ -1661,7 +1682,8 @@ function toggleStealMenu() {
   const existing = chip.querySelector('.steal-popup');
   if (existing) { existing.remove(); stealMenuOpenState = false; return; }
   // Build steal menu from dealer items that have count > 0
-  const stealable = ITEM_KEYS.filter(k => (gm.dealerItems[k] || 0) > 0);
+  // Adrenaline cannot steal adrenaline
+  const stealable = ITEM_KEYS.filter(k => k !== 'adrenaline' && (gm.dealerItems[k] || 0) > 0);
   if (!stealable.length) { playLog('Dealer has no items to steal', 'neutral'); return; }
   const popup = document.createElement('div');
   popup.className = 'steal-popup';
