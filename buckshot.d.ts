@@ -20,6 +20,7 @@ export interface InitOutput {
     readonly interface_new: () => number;
     readonly interface_post: (a: number, b: number, c: number) => [number, number];
     readonly interface_set_phone_vec: (a: number, b: number, c: number, d: number, e: number) => void;
+    readonly __externref_table_alloc: () => number;
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
