@@ -1451,7 +1451,7 @@ function startGame() {
     dealerItems:  newItems(4),
     // Active effects this turn
     playerFx: { saw: false, jammer: false, inverter: false },
-    dealerFx:  { saw: false, jammer: false, inverter: false },
+    dealerFx:  { saw: false, jammer: false, inverter: false, spyglassPeeked: null, phonePeeked: {} },
     // Derived/temp
     isPlayerTurn: true,
     gameOver: false,
@@ -1514,7 +1514,7 @@ function dealNewLoad() {
   if (!gm) return;
   // Reset active effects
   gm.playerFx = { saw: false, jammer: false, inverter: false };
-  gm.dealerFx  = { saw: false, jammer: false, inverter: false };
+  gm.dealerFx  = { saw: false, jammer: false, inverter: false, spyglassPeeked: null, phonePeeked: {} };
   gm.spyglassRevealed = null;
   gm.phoneRevealed    = null;
 
@@ -2058,8 +2058,24 @@ function dealerEngineTurn() {
   platform.post(`engine s opp su ${gm.playerFx.saw}`);
   platform.post(`engine s opp iu ${gm.playerFx.inverter}`);
 
-  // Phone vec from dealer's perspective — all unknowns to engine
+  // Phone vec from dealer's perspective — encode any peeked shell knowledge
   const phoneVec = new Array(remaining.length).fill(0);
+  if (gm.dealerFx.spyglassPeeked && gm.dealerFx.spyglassPeeked.idx === gm.shellIdx) {
+    phoneVec[0] = gm.dealerFx.spyglassPeeked.type === 'live' ? 1 : 2;
+  } else {
+    gm.dealerFx.spyglassPeeked = null; // stale — clear it
+  }
+  if (gm.dealerFx.phonePeeked) {
+    for (const [absIdx, type] of Object.entries(gm.dealerFx.phonePeeked)) {
+      const relIdx = Number(absIdx) - gm.shellIdx;
+      if (relIdx > 0 && relIdx < remaining.length) {
+        phoneVec[relIdx] = type === 'live' ? 1 : 2;
+      }
+    }
+    for (const absIdx of Object.keys(gm.dealerFx.phonePeeked)) {
+      if (Number(absIdx) < gm.shellIdx) delete gm.dealerFx.phonePeeked[absIdx];
+    }
+  }
   platform.set_phone_vec(phoneVec, 'me');
 
   try {
@@ -2140,8 +2156,9 @@ function executeDealerMove(move) {
   } else if (mv === 'usespyglass') {
     if ((gm.dealerItems.spyglass||0) > 0) {
       gm.dealerItems.spyglass--;
-      // Dealer peeks — no player benefit but we show it in log
+      // Dealer peeks — store result so engine can use it next decision
       const next = gm.shells[gm.shellIdx];
+      gm.dealerFx.spyglassPeeked = { idx: gm.shellIdx, type: next };
       playLog(`Dealer used 🔭 Spyglass (peeked)`, 'neutral');
       recordMove('dealer', `🔭 Spyglass (peeked ${next})`);
       renderPlay();
@@ -2151,6 +2168,14 @@ function executeDealerMove(move) {
   } else if (mv === 'usephone') {
     if ((gm.dealerItems.phone||0) > 0) {
       gm.dealerItems.phone--;
+      // Reveal a random unknown shell and store it for the engine
+      const unknownIdxs = [];
+      for (let i = gm.shellIdx + 1; i < gm.shells.length; i++) unknownIdxs.push(i);
+      if (unknownIdxs.length > 0) {
+        const idx = unknownIdxs[Math.floor(Math.random() * unknownIdxs.length)];
+        if (!gm.dealerFx.phonePeeked) gm.dealerFx.phonePeeked = {};
+        gm.dealerFx.phonePeeked[idx] = gm.shells[idx];
+      }
       playLog('Dealer used 📱 Burner Phone (gathered info)', 'neutral');
       recordMove('dealer', '📱 Phone');
       renderPlay();
