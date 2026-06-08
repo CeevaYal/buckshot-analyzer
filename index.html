@@ -1214,6 +1214,7 @@ function renderActiveEffects(){
 }
 
 function setTurn(t){
+  if(analyzing) return;
   turnPerspective=t;
   document.getElementById("btn-turn-you").className   ="turn-btn"+(t==="you"   ?" active-you":"");
   document.getElementById("btn-turn-dealer").className="turn-btn"+(t==="dealer"?" active-dealer":"");
@@ -2066,6 +2067,15 @@ function dealerEngineTurn() {
     const move  = reply[0];
     executeDealerMove(move);
   } catch(e) {
+    // WASM panicked — the platform object is permanently corrupted.
+    // Reconstruct it entirely before doing anything else, then fall back
+    // to the simple heuristic AI (which never touches platform).
+    engineReady = false;
+    try {
+      platform = new window._EngineInterface();
+      platform.post('engine init');
+      engineReady = true;
+    } catch(_) {}
     dealerSimpleTurn();
   }
 }
@@ -2569,6 +2579,7 @@ renderLog();
   try {
     const { default: init, Interface } = await import("./buckshot.js");
     await init();
+    window._EngineInterface = Interface;
     platform = new Interface();
     platform.post("engine init");
     engineReady = true;
