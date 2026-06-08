@@ -2025,6 +2025,7 @@ function dealerEngineTurn() {
   const live  = remaining.filter(x=>x==='live').length;
   const blank = remaining.filter(x=>x==='blank').length;
 
+  try {
   platform.post('engine init');
   platform.post(`engine s dshell ${live}`);
   platform.post(`engine s bshell ${blank}`);
@@ -2078,14 +2079,11 @@ function dealerEngineTurn() {
   }
   platform.set_phone_vec(phoneVec, 'me');
 
-  try {
-    const reply = platform.post('engine go').split(' ');
-    const move  = reply[0];
-    executeDealerMove(move);
+  const reply = platform.post('engine go').split(' ');
+  const move  = reply[0];
+  executeDealerMove(move);
   } catch(e) {
-    // WASM panicked — the platform object is permanently corrupted.
-    // Reconstruct it entirely before doing anything else, then fall back
-    // to the simple heuristic AI (which never touches platform).
+    // WASM panicked — reconstruct platform and fall back to simple AI
     engineReady = false;
     try {
       platform = new window._EngineInterface();
